@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES6",
+    "skipLibCheck": true,
+    "strict": true
+  },
+  "files": ["./src/index.ts"]
+}
