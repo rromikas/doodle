@@ -10,7 +10,7 @@ connection.on("ReceiveMessage", (user, data) => {
 });
 connection
     .start()
-    .then(() => connection.invoke("SendMessage", "Asdasdasd", `Someone joined at ${new Date().toISOString().split("T")[1]}`))
+    .then(() => connection.invoke("SendMessage", "username", `Someone joined at ${new Date().toISOString().split("T")[1]}`))
     .catch((error) => {
     console.log("error starting", error.toString());
 });

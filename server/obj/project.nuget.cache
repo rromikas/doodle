@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sxM4ZuKlLMdraqiUmIElKMuUDTJggrAaPlmeLcQ9on30P+oEBffLsvrmSxYxFhpJ5nouu6AEqZUpLcLDPQurWw==",
+  "dgSpecHash": "veWM99id3DzI6uaY003DLVaFeujASAm6vCPbF/QBvxQRJiUuysxTGt/2gfdxBrwVUoyjHnibMkj1zspUrol8mw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\rromi\\GameServer\\GameServer.csproj",
+  "projectFilePath": "C:\\Users\\rromi\\doodle\\server\\GameServer.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

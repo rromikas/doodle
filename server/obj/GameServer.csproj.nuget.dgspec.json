@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rromi\\GameServer\\GameServer.csproj": {}
+    "C:\\Users\\rromi\\doodle\\server\\GameServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rromi\\GameServer\\GameServer.csproj": {
+    "C:\\Users\\rromi\\doodle\\server\\GameServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rromi\\GameServer\\GameServer.csproj",
+        "projectUniqueName": "C:\\Users\\rromi\\doodle\\server\\GameServer.csproj",
         "projectName": "GameServer",
-        "projectPath": "C:\\Users\\rromi\\GameServer\\GameServer.csproj",
+        "projectPath": "C:\\Users\\rromi\\doodle\\server\\GameServer.csproj",
         "packagesPath": "C:\\Users\\rromi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rromi\\GameServer\\obj\\",
+        "outputPath": "C:\\Users\\rromi\\doodle\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
