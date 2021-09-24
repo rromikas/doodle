@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dest",
     "target": "ES6",
     "skipLibCheck": true,
     "strict": true

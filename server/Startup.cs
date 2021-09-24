@@ -26,9 +26,9 @@ namespace GameServer
         {
             services.AddRazorPages();
             services.AddSignalR();
-           services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder.WithOrigins("http://localhost:5500")
+                builder.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500")
                     .AllowAnyMethod()
                     .AllowAnyHeader().AllowCredentials();
             }));

@@ -11,7 +11,6 @@ let connection = new signalR.HubConnectionBuilder()
 const ChatInstance = new Chat(connection);
 
 connection.on("ReceiveMessage", (user, data) => {
-  console.log(data);
   ChatInstance.addMessage(data);
 });
 
