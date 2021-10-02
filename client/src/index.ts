@@ -1,5 +1,6 @@
 import * as SignalR from "./signalr/index.js";
 import { Chat } from "./classes/Chat.js";
+import { Game } from "./classes/Game.js";
 
 declare var signalR: typeof SignalR;
 
@@ -8,10 +9,26 @@ let connection = new signalR.HubConnectionBuilder()
   .withUrl("http://localhost:5000/gameHub")
   .build();
 
-const ChatInstance = new Chat(connection);
+// const ChatInstance = new Chat(connection);
 
-connection.on("ReceiveMessage", (user, data) => {
-  ChatInstance.addMessage(data);
+// connection.on("ReceiveMessage", (user, data) => {
+//   ChatInstance.addMessage(data);
+// });
+
+const GameInstance = new Game(connection);
+
+const onJoin = () => {
+  let input = document.querySelector("#username-input") as HTMLInputElement;
+  let username = input.value;
+  if (username) {
+    GameInstance.join(username);
+  }
+};
+document.getElementById("join-btn")?.addEventListener("click", onJoin);
+document.getElementById("username-input")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    onJoin();
+  }
 });
 
 connection
