@@ -24,7 +24,9 @@ const onJoin = () => {
 });
 connection
     .start()
-    .then(() => connection.invoke("SendMessage", "username", `Someone joined at ${new Date().toISOString().split("T")[1]}`))
+    .then(() => {
+    console.log("Connection started");
+})
     .catch((error) => {
     console.log("error starting", error.toString());
 });
