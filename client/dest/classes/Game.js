@@ -1,3 +1,5 @@
+import { getRandomInt } from "../helper.js";
+import Player from "./Player.js";
 export class Game {
     constructor(conn) {
         this.pressedKeys = {
@@ -20,6 +22,19 @@ export class Game {
         this.screenHeight = window.innerHeight;
         this.mapHeight = parseInt(this.mapNode.style.height);
         this.scoreNode = document.getElementById("score");
+        this.players = {};
+        this.connection.on("PlayersInfo", (playersDict) => {
+            Object.keys(playersDict).forEach((username) => {
+                if (!(username in this.players) && username !== this.username) {
+                    this.players[username] = new Player(username, playersDict[username].coordinate);
+                }
+            });
+        });
+        this.connection.on("PlayerMoveInfo", (username, coordinate) => {
+            if (username in this.players) {
+                this.players[username].setCoordinate(coordinate);
+            }
+        });
     }
     join(username) {
         this.username = username;
@@ -29,7 +44,11 @@ export class Game {
         scoreField.innerHTML = "100";
         const login = document.getElementById("login");
         login.style.display = "none";
-        this.connection.invoke("SendMessage", username, { command: "LOGIN" });
+        const coordinate = { x: getRandomInt(100, 600), y: -100 };
+        this.playerNode.style.transform = `translate(${coordinate.x}px, ${coordinate.y}px)`;
+        this.connection.invoke("login", username, coordinate).catch((error) => {
+            console.log("Login error", error);
+        });
     }
     addCommandListeners() {
         window.addEventListener("keydown", (e) => {
@@ -91,9 +110,6 @@ export class Game {
         let newX = px + dx, newY = py + dy;
         this.playerNode.style.transform = `translate(${newX}px, ${newY}px)`;
         this.mapNode.style.transform = `translateY(${mapY + mapDy}px)`;
-        this.connection.invoke("SendMessage", this.username, JSON.stringify({ command: "MOVE", data: { x: newX, y: Math.abs(mapY) + newY } }));
-    }
-    login(username) {
-        this.connection.invoke("SendMessage", username, JSON.stringify({ command: "LOGIN" }));
+        this.connection.invoke("move", this.username, { x: newX, y: newY - (mapY + mapDy) });
     }
 }

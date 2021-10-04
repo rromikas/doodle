@@ -8,5 +8,6 @@ namespace GameServer.Constants
     public static class HubMethods
     {
         public const string ALL_PLAYERS_INFO = "PlayersInfo";
+        public const string PLAYER_MOVE_INFO = "PlayerMoveInfo";
     }
 }
