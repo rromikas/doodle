@@ -37,6 +37,7 @@ export class Game {
     this.mapHeight = parseInt(this.mapNode.style.height);
     this.scoreNode = document.getElementById("score") as HTMLElement;
     this.players = {};
+    this.addJoinListeners();
     this.connection.on("PlayersInfo", (playersDict) => {
       Object.keys(playersDict).forEach((username) => {
         if (!(username in this.players) && username !== this.username) {
@@ -51,8 +52,18 @@ export class Game {
     });
   }
 
-  join(username: string) {
-    this.username = username;
+  addJoinListeners() {
+    document.getElementById("join-btn")?.addEventListener("click", this.join);
+    document.getElementById("username-input")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        this.join();
+      }
+    });
+  }
+
+  join() {
+    let input = document.querySelector("#username-input") as HTMLInputElement;
+    this.username = input.value;
     const usernameField = document.getElementById("username") as HTMLElement;
     // usernameField.innerHTML = username;
     const scoreField = document.getElementById("score") as HTMLElement;
@@ -62,7 +73,7 @@ export class Game {
     const coordinate = { x: getRandomInt(100, 600), y: -100 };
     this.playerNode.style.transform = `translate(${coordinate.x}px, ${coordinate.y}px)`;
 
-    this.connection.invoke("login", username, coordinate).catch((error) => {
+    this.connection.invoke("login", this.username, coordinate).catch((error) => {
       console.log("Login error", error);
     });
   }
