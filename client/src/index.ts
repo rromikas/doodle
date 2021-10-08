@@ -1,41 +1,29 @@
 import * as SignalR from "./signalr/index.js";
-import { Chat } from "./classes/Chat.js";
 import { Game } from "./classes/Game.js";
 
 declare var signalR: typeof SignalR;
 
-let connection = new signalR.HubConnectionBuilder()
-  .configureLogging(1)
-  .withUrl("http://localhost:5000/gameHub")
-  .build();
+const urls = ["http://192.168.1.137:5000/gameHub", "http://localhost:5000/gameHub"];
 
-// const ChatInstance = new Chat(connection);
+//builConnection method tries different url to build connection. To some urls can be connected from different machines.
+const buildConnection = (urlIndex: number = 0): Promise<SignalR.HubConnection> => {
+  let conn = new signalR.HubConnectionBuilder().configureLogging(1).withUrl(urls[urlIndex]).build();
 
-// connection.on("ReceiveMessage", (user, data) => {
-//   ChatInstance.addMessage(data);
-// });
-
-const GameInstance = new Game(connection);
-
-const onJoin = () => {
-  let input = document.querySelector("#username-input") as HTMLInputElement;
-  let username = input.value;
-  if (username) {
-    GameInstance.join(username);
-  }
+  return conn
+    .start()
+    .then(() => {
+      console.log("Connection started");
+      return conn;
+    })
+    .catch((error) => {
+      console.log("Error while starting connection:", error.toString());
+      return buildConnection(urlIndex + 1);
+    });
 };
-document.getElementById("join-btn")?.addEventListener("click", onJoin);
-document.getElementById("username-input")?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    onJoin();
-  }
-});
 
-connection
-  .start()
-  .then(() => {
-    console.log("Connection started");
-  })
-  .catch((error) => {
-    console.log("error starting", error.toString());
-  });
+const main = async () => {
+  let connection = await buildConnection();
+  new Game(connection);
+};
+
+main();
