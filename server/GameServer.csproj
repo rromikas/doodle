@@ -6,10 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Constants\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.26" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
