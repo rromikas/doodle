@@ -9,5 +9,10 @@ namespace GameServer.Models
     {
         public int X { get; set; }
         public int Y { get; set; }
+
+        public static Coordinate GenerateRandom()
+        {
+            return new Coordinate() { X = 5, Y = 5 };
+        }
     }
 }
