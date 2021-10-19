@@ -5,17 +5,24 @@ using GameServer.Patterns.Builder;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
+using System.Text.Json;
+
+
 
 namespace GameServer.Hubs
 {
+
     public class GameHub : Hub
     {
-        private readonly Map _map = null;
-
+        private static Map _map = null;
         public GameHub() 
         {
-            FileLogger.logger.Log("GameHub started!");
-            _map = MapBuilder.Build();
+            if(_map == null)
+            {
+                FileLogger.logger.Log("GameHub started!");
+                _map = MapBuilder.Build();
+            }
+            
         }
 
         public async Task Move(string playerId, Coordinate coordinate)

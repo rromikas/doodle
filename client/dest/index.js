@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Game } from "./classes/Game.js";
-const urls = ["https://192.168.1.137:5000/gameHub", "http://localhost:5000/gameHub"];
+const urls = ["http://192.168.1.137:5000/gameHub", "http://localhost:5000/gameHub"];
 //builConnection method tries different url to build connection. To some urls can be connected from different machines.
 const buildConnection = (urlIndex = 0) => {
     let conn = new signalR.HubConnectionBuilder().configureLogging(1).withUrl(urls[urlIndex]).build();
