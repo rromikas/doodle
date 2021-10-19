@@ -7,7 +7,7 @@ namespace GameServer.Models
     public class BaseObstacle: BaseUnit
     {
         private int _damagePoints;
-        public BaseObstacle(Coordinate coordinate, int damagePoints, ColorTypes color) : base(coordinate, color)
+        public BaseObstacle(Coordinate coordinate, int damagePoints, ColorTypes color = ColorTypes.Black) : base(coordinate, color)
         {
             _damagePoints = damagePoints;
         }

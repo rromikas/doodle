@@ -12,12 +12,15 @@ namespace GameServer.Models
         public IMoves MoveStrategy { get; set; }
         public ColorTypes Color { get; set; }
         public Coordinate Coordinate { get; set; }
-        public BaseUnit(Coordinate coordinate, ColorTypes color = ColorTypes.Black)
+        public Size Size { get; set; }
+
+        public BaseUnit(Coordinate coordinate, ColorTypes color)
         {
             MoveStrategy = new MovesNot();
 
             Coordinate = coordinate;
             Color = color;
+            Size = new Size();
         }
 
         public void TryToMove()

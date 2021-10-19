@@ -1,35 +1,33 @@
 ﻿using GameServer.Constants;
 using GameServer.Models;
 using GameServer.Models.Singleton;
+using GameServer.Patterns.Builder;
 using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameServer.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly Dictionary<string, Player> _players = new Dictionary<string, Player>();
-       
+        private readonly Map _map = null;
 
         public GameHub() 
         {
             FileLogger.logger.Log("GameHub started!");
+            _map = MapBuilder.Build();
         }
 
-        public async Task Move(string playerId, Coordinate cooradinate)
+        public async Task Move(string playerId, Coordinate coordinate)
         {
-            _players[playerId].Coordinate = cooradinate;
-            await Clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, playerId, cooradinate);
+            _map.UpdatePlayerById(playerId, coordinate);
+            await Clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, playerId, coordinate, _map);
         }
 
         public async Task Login(string playerId, Coordinate coordinate)
         {
-            _players.Add(playerId, new Player(playerId));
-            _players[playerId].Coordinate = coordinate;
-            await Clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _players);
+            _map.AddNewPlayer(playerId, coordinate);
+            await Clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _map);
             FileLogger.logger.Log(String.Format("New player with id: '{0}' joyned! ", playerId));
         }
 

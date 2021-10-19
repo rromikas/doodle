@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace GameServer.Models
+{
+    public class Island : BaseObstacle
+    {
+        const int DAMAGE_POINTS = 0;
+        public Island(Coordinate coordinate) : base(coordinate, DAMAGE_POINTS)
+        {
+        }
+    }
+}
