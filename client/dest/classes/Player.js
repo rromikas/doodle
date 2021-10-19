@@ -4,6 +4,7 @@ class Player {
         this.username = username;
         this.node = document.createElement("div");
         this.node.classList.add("otherPlayer");
+        this.node.innerHTML = username;
         (_a = document.getElementById("map")) === null || _a === void 0 ? void 0 : _a.appendChild(this.node);
         this.setCoordinate(coordinate);
     }

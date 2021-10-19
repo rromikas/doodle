@@ -1,5 +1,6 @@
 import { getRandomInt } from "../helper.js";
 import Player from "./Player.js";
+import MapObject from "./MapObject.js";
 export class Game {
     constructor(conn) {
         this.pressedKeys = {
@@ -15,6 +16,9 @@ export class Game {
             ArrowRight: 8,
         };
         this.username = "";
+        this.players = {};
+        this.mapObjects = [];
+        this.initialMapSet = false;
         this.connection = conn;
         this.addCommandListeners();
         this.playerNode = document.getElementById("player");
@@ -22,12 +26,14 @@ export class Game {
         this.screenHeight = window.innerHeight;
         this.mapHeight = parseInt(this.mapNode.style.height);
         this.scoreNode = document.getElementById("score");
-        this.players = {};
         this.addJoinListeners();
-        this.connection.on("PlayersInfo", (playersDict) => {
-            Object.keys(playersDict).forEach((username) => {
+        this.connection.on("PlayersInfo", (map) => {
+            if (!this.initialMapSet) {
+                this.initializeMap(map);
+            }
+            Object.keys(map._players).forEach((username) => {
                 if (!(username in this.players) && username !== this.username) {
-                    this.players[username] = new Player(username, playersDict[username].coordinate);
+                    this.players[username] = new Player(username, map._players[username].coordinate);
                 }
             });
         });
@@ -37,9 +43,24 @@ export class Game {
             }
         });
     }
+    initializeMap(map) {
+        map._blueFoods.forEach((x) => {
+            this.mapObjects.push(new MapObject(x, "food"));
+        });
+        map._blueRocks.forEach((x) => {
+            this.mapObjects.push(new MapObject(x, "rock"));
+        });
+        map._islands.forEach((x) => {
+            this.mapObjects.push(new MapObject(x, "island"));
+        });
+        map._snowBalls.forEach((x) => {
+            this.mapObjects.push(new MapObject(x, "snowBall"));
+        });
+        this.initialMapSet = true;
+    }
     addJoinListeners() {
         var _a, _b;
-        (_a = document.getElementById("join-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.join);
+        (_a = document.getElementById("join-btn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.join.bind(this));
         (_b = document.getElementById("username-input")) === null || _b === void 0 ? void 0 : _b.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 this.join();
@@ -57,6 +78,7 @@ export class Game {
         login.style.display = "none";
         const coordinate = { x: getRandomInt(100, 600), y: -100 };
         this.playerNode.style.transform = `translate(${coordinate.x}px, ${coordinate.y}px)`;
+        this.playerNode.innerHTML = this.username;
         this.connection.invoke("login", this.username, coordinate).catch((error) => {
             console.log("Login error", error);
         });

@@ -8,6 +8,7 @@ class Player {
     this.username = username;
     this.node = document.createElement("div");
     this.node.classList.add("otherPlayer");
+    this.node.innerHTML = username;
     document.getElementById("map")?.appendChild(this.node);
     this.setCoordinate(coordinate);
   }
