@@ -7,8 +7,6 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 
-
-
 namespace GameServer.Hubs
 {
 
@@ -22,7 +20,7 @@ namespace GameServer.Hubs
                 FileLogger.logger.Log("GameHub started!");
                 _map = MapBuilder.Build();
             }
-            
+            FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
 
         public async Task Move(string playerId, Coordinate coordinate)

@@ -9,9 +9,11 @@ namespace GameServer.Models
     public class SnowBall: BaseObstacle
     {
         const int DAMAGE_POINTS = 50;
+
         public SnowBall(Coordinate coordinate): base (coordinate, DAMAGE_POINTS)
         {
             MoveStrategy = new MovesDown();
+            Size = new Size(50, 50);
         }
     }
 }

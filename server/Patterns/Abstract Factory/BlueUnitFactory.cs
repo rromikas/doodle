@@ -22,17 +22,17 @@ namespace GameServer.Patterns
             return Foods;
         }
 
-        public BaseUnit CreateRock()
+        public BaseObstacle CreateRock()
         {
             return new BlueRock(Coordinate.GenerateRandom());
         }
 
-        public List<BaseUnit> BuildManyRocks(int Quantity)
+        public List<BaseObstacle> BuildManyRocks(int Quantity)
         {
-            List<BaseUnit> Rocks = new List<BaseUnit>();
+            List<BaseObstacle> Rocks = new List<BaseObstacle>();
             for (int i = 0; i < Quantity; i++)
             {
-                Rocks.Add(CreateFood());
+                Rocks.Add(CreateRock());
             }
 
             return Rocks;

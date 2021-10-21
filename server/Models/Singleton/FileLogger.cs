@@ -18,10 +18,17 @@ namespace GameServer.Models.Singleton
         {
             lock (lockObj)
             {
-                using (StreamWriter streamWriter = new StreamWriter(filePath))
+                if (!File.Exists(filePath))
                 {
-                    streamWriter.WriteLine(String.Format("[{0}] - {1}", DateTime.Now.ToString(), message));
-                    streamWriter.Close();
+                    // Create a file to write to.
+                    using (StreamWriter sw = File.CreateText(filePath))
+                    {
+                        sw.WriteLine(String.Format("[{0}] - {1}", DateTime.Now.ToString(), message));
+                    }
+                }
+                using (StreamWriter sw = File.AppendText(filePath))
+                {
+                    sw.WriteLine(String.Format("[{0}] - {1}", DateTime.Now.ToString(), message));
                 }
             }
         }

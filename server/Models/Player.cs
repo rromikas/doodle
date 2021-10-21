@@ -14,6 +14,7 @@ namespace GameServer.Models
         public Player(string userName): base(new Coordinate(), Constants.ColorTypes.Black)
         {
             UserName = userName;
+            Size = new Size(50, 50);
         }
     }
 }
