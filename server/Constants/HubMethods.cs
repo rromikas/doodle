@@ -9,5 +9,6 @@ namespace GameServer.Constants
     {
         public const string ALL_PLAYERS_INFO = "PlayersInfo";
         public const string PLAYER_MOVE_INFO = "PlayerMoveInfo";
+        public const string REMOVE_UNIT = "RemoveUnit";
     }
 }

@@ -5,7 +5,7 @@ namespace GameServer.Patterns
 {
     public interface IUnitAbstractFactory
     {
-        BaseUnit CreateFood();
+        BaseFood CreateFood();
         BaseUnit CreateRock();
     }
 }

@@ -13,6 +13,7 @@ namespace GameServer.Models
         public ColorTypes Color { get; set; }
         public Coordinate Coordinate { get; set; }
         public Size Size { get; set; }
+        public string Id { get; set; }
 
         public BaseUnit(Coordinate coordinate, ColorTypes color)
         {
@@ -21,6 +22,7 @@ namespace GameServer.Models
             Coordinate = coordinate;
             Color = color;
             Size = new Size();
+            Id = Guid.NewGuid().ToString();
         }
 
         public void TryToMove()

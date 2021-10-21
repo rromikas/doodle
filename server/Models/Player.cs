@@ -9,6 +9,7 @@ namespace GameServer.Models
     {
         public string UserName { get; set; }
         public int Score { get; set; }
+        public int Speed { get; set; } = 10;
        
         public Player(string userName): base(new Coordinate(), Constants.ColorTypes.Black)
         {

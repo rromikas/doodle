@@ -1,13 +1,15 @@
+import { colors } from "../constants/index.js";
 class MapObject {
     constructor(u, type) {
         var _a;
+        this.type = type;
         this.unit = u;
         this.node = document.createElement("div");
         this.node.className = "mapObject";
         this.node.style.borderRadius = "50%";
         this.node.style.left = `${u.coordinate.x}px`;
         this.node.style.bottom = `${u.coordinate.y}px`;
-        this.node.style.background = "blue";
+        this.node.style.background = colors[u.color];
         this.node.style.color = "white";
         switch (type) {
             case "food": {

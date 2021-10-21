@@ -5,7 +5,7 @@ namespace GameServer.Patterns
 {
     public class RedUnitFactory : IUnitAbstractFactory
     {
-        public BaseUnit CreateFood()
+        public BaseFood CreateFood()
         {
             return new RedFood(Coordinate.GenerateRandom());
         }

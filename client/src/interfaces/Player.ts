@@ -1,7 +1,7 @@
 import BaseUnit from "./BaseUnit";
 
 interface Player extends BaseUnit {
-  username: string;
+  userName: string;
 }
 
 export default Player;

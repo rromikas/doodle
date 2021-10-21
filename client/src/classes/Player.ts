@@ -1,16 +1,32 @@
+import IPlayer from "../interfaces/Player";
+
 export type Coordinate = { x: number; y: number };
 
-class Player {
-  username: string;
+class Player implements IPlayer {
+  userName: string;
+  size: number;
+  color: 0 | 1 | 2 | 3;
+  coordinate: Coordinate;
   node: HTMLElement;
+  id: string;
 
-  constructor(username: string, coordinate: Coordinate) {
-    this.username = username;
-    this.node = document.createElement("div");
-    this.node.classList.add("otherPlayer");
-    this.node.innerHTML = username;
-    document.getElementById("map")?.appendChild(this.node);
-    this.setCoordinate(coordinate);
+  constructor(unit: IPlayer, isMain: boolean = false) {
+    this.userName = unit.userName;
+    this.size = unit.size;
+    this.color = unit.color;
+    this.coordinate = unit.coordinate;
+    this.id = unit.id;
+
+    if (isMain) {
+      this.node = document.getElementById("player") as HTMLElement;
+    } else {
+      this.node = document.createElement("div");
+      this.node.classList.add("otherPlayer");
+      document.getElementById("map")?.appendChild(this.node);
+    }
+
+    this.node.innerHTML = unit.userName;
+    this.setCoordinate(unit.coordinate);
   }
 
   setCoordinate({ x, y }: Coordinate) {
