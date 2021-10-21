@@ -19,30 +19,30 @@ namespace GameServer.Patterns.Builder
             Map map = new Map();
             map._islands = BuildIslands();
             map._snowBalls = BuildSnowBalls();
-            map._blueFoods = BuildBlueFoods();
-            map._blueRocks = BuildBlueRocks();
+            map._foods = BuildBlueFoods();
+            map._rocks = BuildBlueRocks();
 
             return map;
         }
 
         public static List<Island> BuildIslands()
         {
-            return _islandBuilder.BuildMany(2);
+            return _islandBuilder.BuildMany(3);
         }
 
         public static List<SnowBall> BuildSnowBalls()
         {
-            return _snowBallBuilder.BuildMany(2);
+            return _snowBallBuilder.BuildMany(3);
         }
 
-        public static List<BaseUnit> BuildBlueFoods()
+        public static List<BaseFood> BuildBlueFoods()
         {
-            return _blueUnitFactory.BuildManyFoods(2);
+            return _blueUnitFactory.BuildManyFoods(3);
         }
 
         public static List<BaseUnit> BuildBlueRocks()
         {
-            return _blueUnitFactory.BuildManyRocks(2);
+            return _blueUnitFactory.BuildManyRocks(3);
         }
     }
 }

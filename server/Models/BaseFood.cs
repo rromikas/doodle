@@ -5,7 +5,7 @@ namespace GameServer.Models
 {
     public class BaseFood: BaseUnit
     {
-        private int _pointReward;
+        public int _pointReward { get; set; }
         public BaseFood(Coordinate coordinate, int pointReward, ColorTypes color) : base(coordinate, color)
         {
             _pointReward = pointReward;

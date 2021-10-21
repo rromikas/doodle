@@ -38,6 +38,14 @@ namespace GameServer.Hubs
             FileLogger.logger.Log(String.Format("New player with id: '{0}' joyned! ", playerId));
         }
 
+        public async Task Eat(string playerId, string foodId)
+        {
+            _map.RemoveFood(foodId);
+            await Clients.All.SendAsync(HubMethods.REMOVE_UNIT, foodId);
+            FileLogger.logger.Log(String.Format("Food with id '{0}' was eaten! ", foodId));
+        }
+
+
         public override async Task OnConnectedAsync()
         {
             await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
