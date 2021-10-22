@@ -12,7 +12,7 @@ namespace GameServer.Models
         public List<SnowBall> _snowBalls { get; set; }
         public List<Island> _islands { get; set; }
         public List<BaseFood> _foods { get; set; }
-        public List<BaseUnit> _rocks { get; set; }
+        public List<BaseObstacle> _rocks { get; set; }
 
         public void UpdatePlayerById(string playerId, Coordinate coordinate)
         {

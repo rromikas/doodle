@@ -10,6 +10,7 @@ namespace GameServer.Models
         const int DAMAGE_POINTS = 0;
         public Island(Coordinate coordinate) : base(coordinate, DAMAGE_POINTS)
         {
+            Size = new Size(100, 100);
         }
     }
 }

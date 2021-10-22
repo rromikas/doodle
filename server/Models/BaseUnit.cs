@@ -21,7 +21,6 @@ namespace GameServer.Models
 
             Coordinate = coordinate;
             Color = color;
-            Size = new Size();
             Id = Guid.NewGuid().ToString();
         }
 
