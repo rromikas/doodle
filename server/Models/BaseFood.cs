@@ -10,7 +10,7 @@ namespace GameServer.Models
         public BaseFood(Coordinate coordinate, int pointReward, ColorTypes color) : base(coordinate, color)
         {
             _pointReward = pointReward;
-            Size = new Size(10, 10);
+            Size = new Size(20, 20);
         }
     }
 }

@@ -4,6 +4,9 @@ import Player from "./Player.js";
 import IMap from "../interfaces/Map.js";
 import MapObject from "./MapObject.js";
 import BaseFood from "../interfaces/BaseFood.js";
+import BaseObstacle from "../interfaces/BaseObstacle";
+import Coordinate from "../interfaces/Coordinate";
+import BaseUnit from "../interfaces/BaseUnit";
 
 type MoveKey = "ArrowDown" | "ArrowUp" | "ArrowLeft" | "ArrowRight";
 
@@ -31,6 +34,7 @@ export class Game {
   mapObjects: MapObject[] = [];
   initialMapSet: boolean = false;
   mainPlayer: Player;
+  topReached: boolean = false;
 
   constructor(conn: HubConnection) {
     this.connection = conn;
@@ -40,10 +44,7 @@ export class Game {
     this.mapHeight = parseInt(this.mapNode.style.height);
     this.scoreNode = document.getElementById("score") as HTMLElement;
     this.addJoinListeners();
-    this.mainPlayer = new Player(
-      { userName: "", size: 0, color: 0, coordinate: { x: 0, y: 0 }, id: "" },
-      true
-    );
+    this.mainPlayer = new Player(null, true);
 
     this.connection.on("PlayersInfo", (map: IMap) => {
       if (!this.initialMapSet) {
@@ -106,7 +107,7 @@ export class Game {
         coordinate: { x: getRandomInt(100, 800), y: -100 },
         userName: input.value,
         color: 0,
-        size: 80,
+        size: { sizeX: 80, sizeY: 80 },
         id: Math.random().toString(),
       },
       true
@@ -139,27 +140,35 @@ export class Game {
     });
   }
 
-  tryEat(foodObject: BaseFood) {
-    const { x: fx, y: fy } = foodObject.coordinate;
-    const { x: px, y: py } = this.mainPlayer.coordinate;
-
-    if (px < fx && fx < px + this.mainPlayer.size) {
-      if (-py < fy && fy < -py + this.mainPlayer.size) {
-        this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-        this.changeSpeed(this.speed + foodObject._pointReward);
-      }
-    }
+  eat(foodObject: BaseFood) {
+    this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
+    this.changeSpeed(this.speed + foodObject._pointReward);
   }
 
-  tryBump(foodObject: BaseFood) {
-    const { x: fx, y: fy } = foodObject.coordinate;
-    const { x: px, y: py } = this.mainPlayer.coordinate;
+  bump(obstacle: BaseObstacle) {}
 
-    if (px < fx && fx > px + this.mainPlayer.size) {
-      if (py < fy && fy > py + this.mainPlayer.size) {
-        this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
+  doObjectsOverlap(
+    unit: BaseUnit,
+    coordinate: Coordinate
+  ): { bumped: boolean; dx: number; dy: number } {
+    const { x: ux, y: uy } = unit.coordinate;
+    const { x: px, y: py } = coordinate;
+
+    let bumped = false;
+    let dx = 0;
+    let dy = 0;
+
+    if (px < ux + unit.size.sizeX && ux < px + this.mainPlayer.size.sizeX) {
+      if (-py < uy + unit.size.sizeY && uy < -py + this.mainPlayer.size.sizeY) {
+        bumped = true;
+        dx = px > ux ? ux + unit.size.sizeX - px : ux - (px + this.mainPlayer.size.sizeX);
+        dy = -py > uy ? uy + unit.size.sizeY + py : uy - (-py + this.mainPlayer.size.sizeY);
+        dx = Math.abs(dx) > Math.abs(dy) ? 0 : dx;
+        dy = dx === 0 ? dy : 0;
       }
     }
+
+    return { bumped, dx, dy };
   }
 
   startMoving() {
@@ -204,24 +213,42 @@ export class Game {
           } else {
             mapDy -= this.moveValues[x]();
           }
-          let score = parseInt(this.scoreNode.innerHTML);
-          this.scoreNode.innerHTML = (score - this.moveValues[x]()).toString();
         } else {
           dx += this.moveValues[x]();
         }
       }
     });
-    let newX = px + dx,
-      newY = py + dy;
-
-    this.mainPlayer.node.style.transform = `translate(${newX}px, ${newY}px)`;
-    this.mapNode.style.transform = `translateY(${mapY + mapDy}px)`;
-    this.mainPlayer.coordinate = { x: newX, y: newY - (mapY + mapDy) };
-    this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
+    let newX = px + dx;
+    let newY = py + dy;
+    let potentialX = newX;
+    let potentialY = newY - (mapY + mapDy);
+    let change = { x: 0, y: 0 };
     this.mapObjects.forEach((x) => {
-      if (x.type === "food") {
-        this.tryEat(x.unit as BaseFood);
-      }
+      let {
+        bumped,
+        dx: changeX,
+        dy: changeY,
+      } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
+      if (bumped)
+        if (x.type === "food") {
+          this.eat(x.unit as BaseFood);
+        } else {
+          change = { x: changeX, y: changeY };
+          this.bump(x.unit as BaseObstacle);
+        }
     });
+
+    this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${
+      newY + (dy ? -change.y : 0)
+    }px)`;
+    this.mapNode.style.transform = `translateY(${mapY + mapDy + (mapDy ? change.y : 0)}px)`;
+    this.mainPlayer.coordinate = { x: potentialX + change.x, y: potentialY + change.y };
+    this.scoreNode.innerHTML = (-potentialY + change.y).toString();
+    this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
+
+    if (-this.mainPlayer.coordinate.y > 9500) {
+      alert("Congratulations! The top reached!");
+      this.topReached = true;
+    }
   }
 }

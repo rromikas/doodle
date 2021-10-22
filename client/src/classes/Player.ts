@@ -1,16 +1,24 @@
 import IPlayer from "../interfaces/Player";
+import Size from "../interfaces/Size";
 
 export type Coordinate = { x: number; y: number };
 
 class Player implements IPlayer {
   userName: string;
-  size: number;
+  size: Size;
   color: 0 | 1 | 2 | 3;
   coordinate: Coordinate;
   node: HTMLElement;
   id: string;
 
-  constructor(unit: IPlayer, isMain: boolean = false) {
+  constructor(u: IPlayer | null, isMain: boolean = false) {
+    let unit = u || {
+      userName: "",
+      size: { sizeX: 0, sizeY: 0 },
+      color: 0,
+      coordinate: { x: 0, y: 0 },
+      id: "",
+    };
     this.userName = unit.userName;
     this.size = unit.size;
     this.color = unit.color;

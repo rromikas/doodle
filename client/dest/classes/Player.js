@@ -1,6 +1,13 @@
 class Player {
-    constructor(unit, isMain = false) {
+    constructor(u, isMain = false) {
         var _a;
+        let unit = u || {
+            userName: "",
+            size: { sizeX: 0, sizeY: 0 },
+            color: 0,
+            coordinate: { x: 0, y: 0 },
+            id: "",
+        };
         this.userName = unit.userName;
         this.size = unit.size;
         this.color = unit.color;

@@ -17,7 +17,7 @@ namespace GameServer.Patterns.Builder
 
         private static readonly GreenUnitFactory _greenUnitFactory = new GreenUnitFactory();
 
-        private const int _defaultObjectsNumber = 3; 
+        private const int _defaultObjectsNumber = 10; 
 
         public static Map Build()
         {
