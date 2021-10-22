@@ -13,7 +13,7 @@ namespace GameServer.Models
         public static Coordinate GenerateRandom()
         {
             var rand = new Random();
-            return new Coordinate() { X = rand.Next(0, 1200), Y = rand.Next(0, 900) };
+            return new Coordinate() { X = rand.Next(0, 1200), Y = rand.Next(0, 9000) };
         }
     }
 }

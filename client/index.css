@@ -82,11 +82,14 @@
 }
 
 .mapObject {
-  width: 65px;
-  height: 65px;
   display: flex;
   position: absolute;
   justify-content: center;
   align-items: center;
   font-size: 12px;
+  text-transform: capitalize;
+}
+
+.island {
+  border-radius: 20px !important;
 }

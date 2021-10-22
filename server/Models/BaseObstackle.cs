@@ -11,7 +11,9 @@ namespace GameServer.Models
         public BaseObstacle(Coordinate coordinate, int damagePoints, ColorTypes color = ColorTypes.Black) : base(coordinate, color)
         {
             _damagePoints = damagePoints;
-            Size = new Size(30, 30);
+            var rand = new Random();
+            var size = rand.Next(30, 50);
+            Size = new Size(size, size);
         }
     }
 }

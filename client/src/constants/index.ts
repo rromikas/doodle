@@ -3,4 +3,6 @@ export const colors = {
   1: "red",
   2: "green",
   3: "blue",
+  4: "deepskyblue",
+  5: "brown",
 };

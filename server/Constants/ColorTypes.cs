@@ -6,6 +6,8 @@ namespace GameServer.Constants
         Black,
         Red,
         Green,
-        Blue
+        Blue,
+        Snow,
+        Brown
     }
 }

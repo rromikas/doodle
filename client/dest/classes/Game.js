@@ -19,6 +19,7 @@ export class Game {
         this.players = {};
         this.mapObjects = [];
         this.initialMapSet = false;
+        this.topReached = false;
         this.connection = conn;
         this.addCommandListeners();
         this.mapNode = document.getElementById("map");
@@ -26,7 +27,7 @@ export class Game {
         this.mapHeight = parseInt(this.mapNode.style.height);
         this.scoreNode = document.getElementById("score");
         this.addJoinListeners();
-        this.mainPlayer = new Player({ userName: "", size: 0, color: 0, coordinate: { x: 0, y: 0 }, id: "" }, true);
+        this.mainPlayer = new Player(null, true);
         this.connection.on("PlayersInfo", (map) => {
             if (!this.initialMapSet) {
                 this.initializeMap(map);
@@ -53,6 +54,7 @@ export class Game {
         });
     }
     initializeMap(map) {
+        console.log("MAP", map);
         map._foods.forEach((x) => {
             this.mapObjects.push(new MapObject(x, "food"));
         });
@@ -86,7 +88,7 @@ export class Game {
             coordinate: { x: getRandomInt(100, 800), y: -100 },
             userName: input.value,
             color: 0,
-            size: 80,
+            size: { sizeX: 80, sizeY: 80 },
             id: Math.random().toString(),
         }, true);
         this.connection
@@ -113,24 +115,27 @@ export class Game {
             }
         });
     }
-    tryEat(foodObject) {
-        const { x: fx, y: fy } = foodObject.coordinate;
-        const { x: px, y: py } = this.mainPlayer.coordinate;
-        if (px < fx && fx < px + this.mainPlayer.size) {
-            if (-py < fy && fy < -py + this.mainPlayer.size) {
-                this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-                this.changeSpeed(this.speed + foodObject._pointReward);
-            }
-        }
+    eat(foodObject) {
+        this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
+        this.changeSpeed(this.speed + foodObject._pointReward);
     }
-    tryBump(foodObject) {
-        const { x: fx, y: fy } = foodObject.coordinate;
-        const { x: px, y: py } = this.mainPlayer.coordinate;
-        if (px < fx && fx > px + this.mainPlayer.size) {
-            if (py < fy && fy > py + this.mainPlayer.size) {
-                this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
+    bump(obstacle) { }
+    doObjectsOverlap(unit, coordinate) {
+        const { x: ux, y: uy } = unit.coordinate;
+        const { x: px, y: py } = coordinate;
+        let bumped = false;
+        let dx = 0;
+        let dy = 0;
+        if (px < ux + unit.size.sizeX && ux < px + this.mainPlayer.size.sizeX) {
+            if (-py < uy + unit.size.sizeY && uy < -py + this.mainPlayer.size.sizeY) {
+                bumped = true;
+                dx = px > ux ? ux + unit.size.sizeX - px : ux - (px + this.mainPlayer.size.sizeX);
+                dy = -py > uy ? uy + unit.size.sizeY + py : uy - (-py + this.mainPlayer.size.sizeY);
+                dx = Math.abs(dx) > Math.abs(dy) ? 0 : dx;
+                dy = dx === 0 ? dy : 0;
             }
         }
+        return { bumped, dx, dy };
     }
     startMoving() {
         this.movingInterval = setInterval(() => {
@@ -147,42 +152,57 @@ export class Game {
         this.speed = speed;
     }
     move() {
-        let dx = 0, dy = 0, mapDy = 0;
-        let [px, py] = this.mainPlayer.node.style.transform
-            .split("(")[1]
-            .split(")")[0]
-            .split(",")
-            .map((x) => parseInt(x));
-        let mapY = parseInt(this.mapNode.style.transform.split("(")[1].split(")")[0]);
-        Object.keys(this.pressedKeys).forEach((x, i) => {
-            if (this.pressedKeys[x]) {
-                if (i < 2) {
-                    if ((this.mapHeight - mapY <= this.screenHeight && i === 1) ||
-                        (mapY <= 0 && i === 0) ||
-                        py > -200 ||
-                        py < -350) {
-                        dy += this.moveValues[x]();
+        if (!this.topReached) {
+            let dx = 0, dy = 0, mapDy = 0;
+            let [px, py] = this.mainPlayer.node.style.transform
+                .split("(")[1]
+                .split(")")[0]
+                .split(",")
+                .map((x) => parseInt(x));
+            let mapY = parseInt(this.mapNode.style.transform.split("(")[1].split(")")[0]);
+            Object.keys(this.pressedKeys).forEach((x, i) => {
+                if (this.pressedKeys[x]) {
+                    if (i < 2) {
+                        if ((this.mapHeight - mapY <= this.screenHeight && i === 1) ||
+                            (mapY <= 0 && i === 0) ||
+                            py > -200 ||
+                            py < -350) {
+                            dy += this.moveValues[x]();
+                        }
+                        else {
+                            mapDy -= this.moveValues[x]();
+                        }
                     }
                     else {
-                        mapDy -= this.moveValues[x]();
+                        dx += this.moveValues[x]();
                     }
-                    let score = parseInt(this.scoreNode.innerHTML);
-                    this.scoreNode.innerHTML = (score - this.moveValues[x]()).toString();
                 }
-                else {
-                    dx += this.moveValues[x]();
-                }
+            });
+            let newX = px + dx;
+            let newY = py + dy;
+            let potentialX = newX;
+            let potentialY = newY - (mapY + mapDy);
+            let change = { x: 0, y: 0 };
+            this.mapObjects.forEach((x) => {
+                let { bumped, dx: changeX, dy: changeY, } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
+                if (bumped)
+                    if (x.type === "food") {
+                        this.eat(x.unit);
+                    }
+                    else {
+                        change = { x: changeX, y: changeY };
+                        this.bump(x.unit);
+                    }
+            });
+            this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${newY + (dy ? -change.y : 0)}px)`;
+            this.mapNode.style.transform = `translateY(${mapY + mapDy + (mapDy ? change.y : 0)}px)`;
+            this.mainPlayer.coordinate = { x: potentialX + change.x, y: potentialY + change.y };
+            this.scoreNode.innerHTML = (-potentialY + change.y).toString();
+            this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
+            if (-this.mainPlayer.coordinate.y > 9500) {
+                alert("Congratulations! The top reached!");
+                this.topReached = true;
             }
-        });
-        let newX = px + dx, newY = py + dy;
-        this.mainPlayer.node.style.transform = `translate(${newX}px, ${newY}px)`;
-        this.mapNode.style.transform = `translateY(${mapY + mapDy}px)`;
-        this.mainPlayer.coordinate = { x: newX, y: newY - (mapY + mapDy) };
-        this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
-        this.mapObjects.forEach((x) => {
-            if (x.type === "food") {
-                this.tryEat(x.unit);
-            }
-        });
+        }
     }
 }
