@@ -3,7 +3,8 @@
     "outDir": "dest",
     "target": "ES6",
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "lib": ["es6", "dom", "es2017"]
   },
   "files": ["./src/index.ts"]
 }
