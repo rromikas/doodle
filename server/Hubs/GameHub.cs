@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
 using System.Text.Json;
+using GameServer.Patterns.Command;
 
 namespace GameServer.Hubs
 {
@@ -13,6 +14,9 @@ namespace GameServer.Hubs
     public class GameHub : Hub
     {
         private static Map _map = null;
+
+        private GameController _gameController = new GameController();
+
         public GameHub() 
         {
             if(_map == null)
@@ -25,22 +29,17 @@ namespace GameServer.Hubs
 
         public async Task Move(string playerId, Coordinate coordinate)
         {
-            _map.UpdatePlayerById(playerId, coordinate);
-            await Clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, playerId, coordinate, _map);
+            await _gameController.Run(new MoveCommand(playerId, coordinate, _map, Clients));
         }
 
         public async Task Login(string playerId, Coordinate coordinate)
         {
-            _map.AddNewPlayer(playerId, coordinate);
-            await Clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _map);
-            FileLogger.logger.Log(String.Format("New player with id: '{0}' joyned! ", playerId));
+            await _gameController.Run(new LoginCommand(playerId, coordinate, _map, Clients));
         }
 
         public async Task Eat(string playerId, string foodId)
         {
-            _map.RemoveFood(foodId);
-            await Clients.All.SendAsync(HubMethods.REMOVE_UNIT, foodId);
-            FileLogger.logger.Log(String.Format("Food with id '{0}' was eaten! ", foodId));
+            await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients));
         }
 
 

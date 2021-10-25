@@ -14,6 +14,11 @@ namespace GameServer.Models
         public List<BaseFood> _foods { get; set; }
         public List<BaseObstacle> _rocks { get; set; }
 
+        public Coordinate GetPlayerCoordinateById(string playerId)
+        {
+            return _players[playerId].Coordinate;
+        }
+
         public void UpdatePlayerById(string playerId, Coordinate coordinate)
         {
             _players[playerId].Coordinate = coordinate;
@@ -24,10 +29,27 @@ namespace GameServer.Models
             _players.Add(playerId, new Player(playerId));
             _players[playerId].Coordinate = coordinate;
         }
-        public void RemoveFood(string foodId)
+
+        public void RemovePlayer(string playerId)
         {
-            var found = _foods.Find(x => x.Id.CompareTo(foodId) == 0);
-            if (found != null) _foods.Remove(found);
+            _players.Remove(playerId);
+        }
+
+        public BaseFood RemoveFood(string foodId)
+        {
+            var food = _foods.Find(x => x.Id.CompareTo(foodId) == 0);
+            if (food != null)
+            {
+                _foods.Remove(food);
+                return food;
+            }
+           
+            return new BlueFood(new Coordinate());
+        }
+
+        public void AddFood(BaseFood food)
+        {
+            _foods.Add(food);
         }
     }
 }
