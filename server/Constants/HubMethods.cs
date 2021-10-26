@@ -10,5 +10,9 @@ namespace GameServer.Constants
         public const string ALL_PLAYERS_INFO = "PlayersInfo";
         public const string PLAYER_MOVE_INFO = "PlayerMoveInfo";
         public const string REMOVE_UNIT = "RemoveUnit";
+        public const string ADD_UNIT = "AddUnit";
+        public const string PAUSE = "Pause";
+        public const string RESUME = "Resume";
+        public const string LOGOUT = "Logout";
     }
 }

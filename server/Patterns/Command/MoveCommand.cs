@@ -27,13 +27,13 @@ namespace GameServer.Patterns.Command
         {
             _lastCoordinate = _map.GetPlayerCoordinateById(_playerId);
             _map.UpdatePlayerById(_playerId, _coordinate);
-            await _clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, _playerId, _coordinate, _map);
+            await _clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, _playerId, _coordinate);
         }
 
         public override async Task Undo()
         {
             _map.UpdatePlayerById(_playerId, _coordinate);
-            await _clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, _playerId, _lastCoordinate, _map);
+            await _clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, _playerId, _lastCoordinate, true);
         }
     }
 }

@@ -6,6 +6,7 @@ interface BaseUnit {
   coordinate: Coordinate;
   size: Size;
   id: string;
+  impact: number;
 }
 
 export default BaseUnit;

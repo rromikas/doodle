@@ -15,7 +15,9 @@ namespace GameServer.Hubs
     {
         private static Map _map = null;
 
-        private GameController _gameController = new GameController();
+        private static Boolean paused = false;
+
+        private static GameController _gameController = new GameController();
 
         public GameHub() 
         {
@@ -29,18 +31,35 @@ namespace GameServer.Hubs
 
         public async Task Move(string playerId, Coordinate coordinate)
         {
-            await _gameController.Run(new MoveCommand(playerId, coordinate, _map, Clients));
+            await _gameController.Run(new MoveCommand(playerId, coordinate, _map, Clients), playerId);
         }
 
         public async Task Login(string playerId, Coordinate coordinate)
         {
-            await _gameController.Run(new LoginCommand(playerId, coordinate, _map, Clients));
+            await _gameController.Run(new LoginCommand(playerId, coordinate, _map, Clients), playerId);
         }
 
         public async Task Eat(string playerId, string foodId)
         {
-            await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients));
+            await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients), playerId);
         }
+
+        public void Undo(string playerId)
+        {
+             _gameController.Undo(playerId);
+        }
+        public void Pause(string playerId)
+        {
+            paused = true;
+            Clients.All.SendAsync(HubMethods.PAUSE, playerId);
+        }
+
+        public void Resume(string playerId)
+        {
+            paused = false;
+            Clients.All.SendAsync(HubMethods.RESUME, playerId);
+        }
+
 
 
         public override async Task OnConnectedAsync()
