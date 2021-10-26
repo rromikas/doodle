@@ -9,30 +9,23 @@ using System.Threading.Tasks;
 
 namespace GameServer.Patterns.Command
 {
-    public class LoginCommand : AbstractCommand
+    public class PauseCommand : AbstractCommand
     {
         private string _playerId;
 
-        private Coordinate _coordinate;
-
-        public LoginCommand(string playerId, Coordinate coordinate, Map map, IHubCallerClients clients) : base(map, clients)
+        public PauseCommand(string playerId, Map map, IHubCallerClients clients) : base(map, clients)
         {
             _playerId = playerId;
-            _coordinate = coordinate;
         }
 
         public override async Task Execute()
         {
-            _map.AddNewPlayer(_playerId, _coordinate);
-            await _clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _map);
-            FileLogger.logger.Log(String.Format("New player with id: '{0}' joyned! ", _playerId));
+            await _clients.All.SendAsync(HubMethods.PAUSE, _playerId);
         }
 
         public override async Task Undo()
         {
-            _map.RemovePlayer(_playerId);
-            await _clients.All.SendAsync(HubMethods.LOGOUT, _playerId);
-            FileLogger.logger.Log(String.Format("Player with id: '{0}' removed! ", _playerId));
+            await _clients.All.SendAsync(HubMethods.RESUME, _playerId);
         }
     }
 }
