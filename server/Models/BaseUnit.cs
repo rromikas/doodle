@@ -15,6 +15,8 @@ namespace GameServer.Models
         public Size Size { get; set; }
         public string Id { get; set; }
 
+        public int Impact { get; set; }
+
         public BaseUnit(Coordinate coordinate, ColorTypes color)
         {
             MoveStrategy = new MovesNot();

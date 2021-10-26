@@ -27,6 +27,9 @@ export class Game {
   };
   mapNode: HTMLElement;
   scoreNode: HTMLElement;
+  speedNode: HTMLElement;
+  pauseBtn: HTMLElement;
+  undoBtn: HTMLElement;
   movingInterval: NodeJS.Timeout | undefined;
   screenHeight: number;
   mapHeight: number;
@@ -35,6 +38,7 @@ export class Game {
   initialMapSet: boolean = false;
   mainPlayer: Player;
   topReached: boolean = false;
+  paused: boolean = false;
 
   constructor(conn: HubConnection) {
     this.connection = conn;
@@ -43,31 +47,72 @@ export class Game {
     this.screenHeight = window.innerHeight;
     this.mapHeight = parseInt(this.mapNode.style.height);
     this.scoreNode = document.getElementById("score") as HTMLElement;
+    this.scoreNode.innerHTML = "100";
+    this.speedNode = document.getElementById("speed") as HTMLElement;
+    this.speedNode.innerHTML = this.speed.toString();
+    this.pauseBtn = document.getElementById("pause-btn") as HTMLElement;
+    this.undoBtn = document.getElementById("undo-btn") as HTMLElement;
     this.addJoinListeners();
     this.mainPlayer = new Player(null, true);
 
-    this.connection.on("PlayersInfo", (map: IMap) => {
-      if (!this.initialMapSet) {
-        this.initializeMap(map);
-      }
-      Object.keys(map._players).forEach((username) => {
-        if (!(username in this.players) && username !== this.mainPlayer.userName) {
-          this.players[username] = new Player(map._players[username]);
-        }
-      });
-    });
-    this.connection.on("PlayerMoveInfo", (username, coordinate) => {
-      if (username in this.players) {
-        this.players[username].setCoordinate(coordinate);
-      }
-    });
+    this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
+    this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
+    this.connection.on("RemoveUnit", this.onRemoveUnit.bind(this));
+    this.connection.on("AddUnit", this.onAddUnit.bind(this));
+    this.connection.on("Logout", this.onLogout.bind(this));
+    this.connection.on("Pause", this.onPause.bind(this));
+    this.connection.on("Resume", this.onResume.bind(this));
+  }
 
-    this.connection.on("RemoveUnit", (unitId) => {
-      let foundIndex = this.mapObjects.findIndex((x) => x.unit.id === unitId);
-      if (foundIndex === -1) return;
-      let found = this.mapObjects[foundIndex];
-      found.node.parentNode?.removeChild(found.node);
-      this.mapObjects.splice(foundIndex, 1);
+  onLogout(username: string) {
+    if (this.mainPlayer.userName === username) {
+      window.location.reload();
+    } else {
+      if (username in this.players) {
+        let node = this.players[username].node;
+        node.parentNode?.removeChild(node);
+        delete this.players[username];
+      }
+    }
+  }
+
+  onUndo() {
+    this.connection.invoke("undo", this.mainPlayer.userName);
+  }
+
+  onRemoveUnit(unitId: string) {
+    let foundIndex = this.mapObjects.findIndex((x) => x.unit.id === unitId);
+    if (foundIndex === -1) return;
+    let found = this.mapObjects[foundIndex];
+    found.node.parentNode?.removeChild(found.node);
+    this.mapObjects.splice(foundIndex, 1);
+  }
+
+  onAddUnit(unit: BaseUnit, username: string) {
+    this.mapObjects.push(new MapObject(unit, "food"));
+    if (username === this.mainPlayer.userName) {
+      this.changeSpeed(-unit.impact);
+    }
+  }
+
+  onPlayerMoveInfo(username: string, coordinate: Coordinate, undo: boolean) {
+    if (username in this.players) {
+      this.players[username].setCoordinate(coordinate);
+    }
+
+    if (username === this.mainPlayer.userName && undo) {
+      this.mainPlayer.setCoordinate(coordinate);
+    }
+  }
+
+  onPlayersInfo(map: IMap) {
+    if (!this.initialMapSet) {
+      this.initializeMap(map);
+    }
+    Object.keys(map._players).forEach((username) => {
+      if (!(username in this.players) && username !== this.mainPlayer.userName) {
+        this.players[username] = new Player(map._players[username]);
+      }
     });
   }
 
@@ -102,13 +147,15 @@ export class Game {
     scoreField.innerHTML = "100";
     const login = document.getElementById("login") as HTMLElement;
     login.style.display = "none";
+    let initialCoordinate = { x: getRandomInt(100, 800), y: -100 };
     this.mainPlayer = new Player(
       {
-        coordinate: { x: getRandomInt(100, 800), y: -100 },
+        coordinate: initialCoordinate,
         userName: input.value,
         color: 0,
         size: { sizeX: 80, sizeY: 80 },
         id: Math.random().toString(),
+        impact: 0,
       },
       true
     );
@@ -138,11 +185,34 @@ export class Game {
         this.stopMoving();
       }
     });
+
+    document.getElementById("undo-btn")?.addEventListener("click", this.onUndo.bind(this));
+    document
+      .getElementById("pause-btn")
+      ?.addEventListener("click", this.invokePauseResume.bind(this));
+  }
+
+  onPause() {
+    this.paused = true;
+    this.pauseBtn.innerHTML = "Resume";
+  }
+
+  onResume() {
+    this.paused = false;
+    this.pauseBtn.innerHTML = "Pause";
+  }
+
+  invokePauseResume() {
+    if (!this.paused) {
+      this.connection.invoke("pause", this.mainPlayer.userName);
+    } else {
+      this.connection.invoke("resume", this.mainPlayer.userName);
+    }
   }
 
   eat(foodObject: BaseFood) {
     this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-    this.changeSpeed(this.speed + foodObject._pointReward);
+    this.changeSpeed(foodObject.impact);
   }
 
   bump(obstacle: BaseObstacle) {}
@@ -183,72 +253,83 @@ export class Game {
     this.movingInterval = undefined;
   }
 
-  changeSpeed(speed: number) {
-    this.speed = speed;
+  changeSpeed(speedChange: number) {
+    this.speed = this.speed + speedChange;
+    this.speedNode.innerHTML = this.speed.toString();
   }
 
-  move() {
-    let dx = 0,
-      dy = 0,
-      mapDy = 0;
+  getMapOffsetY() {
+    return parseInt(this.mapNode.style.transform.split("(")[1].split(")")[0]);
+  }
 
-    let [px, py] = this.mainPlayer.node.style.transform
+  getMainPlayerXY() {
+    return this.mainPlayer.node.style.transform
       .split("(")[1]
       .split(")")[0]
       .split(",")
       .map((x) => parseInt(x));
+  }
 
-    let mapY = parseInt(this.mapNode.style.transform.split("(")[1].split(")")[0]);
+  move() {
+    if (!this.topReached && !this.paused) {
+      let dx = 0,
+        dy = 0,
+        mapDy = 0;
 
-    (Object.keys(this.pressedKeys) as MoveKey[]).forEach((x, i) => {
-      if (this.pressedKeys[x]) {
-        if (i < 2) {
-          if (
-            (this.mapHeight - mapY <= this.screenHeight && i === 1) ||
-            (mapY <= 0 && i === 0) ||
-            py > -200 ||
-            py < -350
-          ) {
-            dy += this.moveValues[x]();
+      let [px, py] = this.getMainPlayerXY();
+
+      let mapY = this.getMapOffsetY();
+
+      (Object.keys(this.pressedKeys) as MoveKey[]).forEach((x, i) => {
+        if (this.pressedKeys[x]) {
+          if (i < 2) {
+            if (
+              (this.mapHeight - mapY <= this.screenHeight && i === 1) ||
+              (mapY <= 0 && i === 0) ||
+              py > -200 ||
+              py < -350
+            ) {
+              dy += this.moveValues[x]();
+            } else {
+              mapDy -= this.moveValues[x]();
+            }
           } else {
-            mapDy -= this.moveValues[x]();
+            dx += this.moveValues[x]();
           }
-        } else {
-          dx += this.moveValues[x]();
         }
+      });
+      let newX = px + dx;
+      let newY = py + dy;
+      let potentialX = newX;
+      let potentialY = newY - (mapY + mapDy);
+      let change = { x: 0, y: 0 };
+      this.mapObjects.forEach((x) => {
+        let {
+          bumped,
+          dx: changeX,
+          dy: changeY,
+        } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
+        if (bumped)
+          if (x.type === "food") {
+            this.eat(x.unit as BaseFood);
+          } else {
+            change = { x: changeX, y: changeY };
+            this.bump(x.unit as BaseObstacle);
+          }
+      });
+
+      this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${
+        newY + (dy ? -change.y : 0)
+      }px)`;
+      this.mapNode.style.transform = `translateY(${mapY + mapDy + (mapDy ? change.y : 0)}px)`;
+      this.mainPlayer.coordinate = { x: potentialX + change.x, y: potentialY + change.y };
+      this.scoreNode.innerHTML = (-potentialY + change.y).toString();
+      this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
+
+      if (-this.mainPlayer.coordinate.y > 9500) {
+        alert("Congratulations! The top reached!");
+        this.topReached = true;
       }
-    });
-    let newX = px + dx;
-    let newY = py + dy;
-    let potentialX = newX;
-    let potentialY = newY - (mapY + mapDy);
-    let change = { x: 0, y: 0 };
-    this.mapObjects.forEach((x) => {
-      let {
-        bumped,
-        dx: changeX,
-        dy: changeY,
-      } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
-      if (bumped)
-        if (x.type === "food") {
-          this.eat(x.unit as BaseFood);
-        } else {
-          change = { x: changeX, y: changeY };
-          this.bump(x.unit as BaseObstacle);
-        }
-    });
-
-    this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${
-      newY + (dy ? -change.y : 0)
-    }px)`;
-    this.mapNode.style.transform = `translateY(${mapY + mapDy + (mapDy ? change.y : 0)}px)`;
-    this.mainPlayer.coordinate = { x: potentialX + change.x, y: potentialY + change.y };
-    this.scoreNode.innerHTML = (-potentialY + change.y).toString();
-    this.connection.invoke("move", this.mainPlayer.userName, this.mainPlayer.coordinate);
-
-    if (-this.mainPlayer.coordinate.y > 9500) {
-      alert("Congratulations! The top reached!");
-      this.topReached = true;
     }
   }
 }

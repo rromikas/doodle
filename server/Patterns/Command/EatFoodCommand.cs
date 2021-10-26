@@ -34,7 +34,7 @@ namespace GameServer.Patterns.Command
         public override async Task Undo()
         {
             _map.AddFood(food);
-            await _clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _foodId);
+            await _clients.All.SendAsync(HubMethods.ADD_UNIT, food, _playerId);
             FileLogger.logger.Log(String.Format("Food with id '{0}' was added! ", _foodId));
         }
     }

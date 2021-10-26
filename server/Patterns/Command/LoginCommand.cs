@@ -31,7 +31,7 @@ namespace GameServer.Patterns.Command
         public override async Task Undo()
         {
             _map.RemovePlayer(_playerId);
-            await _clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _map);
+            await _clients.All.SendAsync(HubMethods.LOGOUT, _playerId);
             FileLogger.logger.Log(String.Format("Player with id: '{0}' removed! ", _playerId));
         }
     }
