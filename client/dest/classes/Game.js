@@ -171,7 +171,7 @@ export class Game {
             this.connection.invoke("pause", this.mainPlayer.userName);
         }
         else {
-            this.connection.invoke("resume", this.mainPlayer.userName);
+            this.connection.invoke("undo", this.mainPlayer.userName);
         }
     }
     eat(foodObject) {
