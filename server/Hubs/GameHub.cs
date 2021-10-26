@@ -44,22 +44,18 @@ namespace GameServer.Hubs
             await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients), playerId);
         }
 
+        public async Task Pause(string playerId)
+        {
+            await _gameController.Run(new PauseCommand(playerId, _map, Clients), playerId);
+            paused = !paused;
+        }
+
         public void Undo(string playerId)
         {
              _gameController.Undo(playerId);
         }
-        public void Pause(string playerId)
-        {
-            paused = true;
-            Clients.All.SendAsync(HubMethods.PAUSE, playerId);
-        }
 
-        public void Resume(string playerId)
-        {
-            paused = false;
-            Clients.All.SendAsync(HubMethods.RESUME, playerId);
-        }
-
+        
 
 
         public override async Task OnConnectedAsync()
