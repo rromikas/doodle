@@ -1,83 +1,56 @@
-﻿using GameServer.Models;
+﻿using GameServer.Constants;
+using GameServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace GameServer.Patterns.Builder
 {
-    public static class MapBuilder
+    public class MapBuilder
     {
-        private static readonly IslandBuilder _islandBuilder = new IslandBuilder();
+        public Map MapObject { get; private set; }
 
-        private static readonly SnowBallBuilder _snowBallBuilder = new SnowBallBuilder();
+        private readonly IUnitAbstractFactory _mapUnitFactory;
 
-        private static readonly BlueUnitFactory _blueUnitFactory = new BlueUnitFactory();
 
-        private static readonly RedUnitFactory _redUnitFactory = new RedUnitFactory();
-
-        private static readonly GreenUnitFactory _greenUnitFactory = new GreenUnitFactory();
-
-        private const int _defaultObjectsNumber = 10; 
-
-        public static Map Build()
+        public MapBuilder (IUnitAbstractFactory mapUnitFactory)
         {
-            Map map = new Map();
-            map._islands = BuildIslands();
-            map._snowBalls = BuildSnowBalls();
-            map._foods = BuildFood();
-            map._rocks = BuildRocks();
-
-            return map;
+            _mapUnitFactory = mapUnitFactory;
         }
 
-        public static List<Island> BuildIslands()
+        public MapBuilder CreateNew()
         {
-            return _islandBuilder.BuildMany(_defaultObjectsNumber);
+            MapObject = new Map();
+            return this;
         }
 
-        public static List<SnowBall> BuildSnowBalls()
+        public MapBuilder AddIslands(int quantity)
         {
-            return _snowBallBuilder.BuildMany(_defaultObjectsNumber);
+            MapObject._islands = IslandBuilder.BuildMany(quantity);
+            return this;
         }
 
-        public static List<BaseFood> BuildFood()
+        public MapBuilder AddSnowBalls(int quantity)
         {
-            return BuildBlueFoods().Concat(BuildRedFoods()).ToList().Concat(BuildGreenFoods()).ToList();
-        }
-      
-        public static List<BaseFood> BuildBlueFoods()
-        {
-            return _blueUnitFactory.BuildManyFoods(_defaultObjectsNumber);
+            MapObject._snowBalls = SnowBallBuilder.BuildMany(quantity);
+            return this;
         }
 
-        public static List<BaseFood> BuildRedFoods()
+        public MapBuilder AddFoods(int quantity)
         {
-            return _redUnitFactory.BuildManyFoods(_defaultObjectsNumber);
+            MapObject._foods = new List<BaseFood>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._foods.Add(_mapUnitFactory.CreateFood());
+            return this;
         }
 
-        public static List<BaseFood> BuildGreenFoods()
+        public MapBuilder AddRocks(int quantity)
         {
-            return _greenUnitFactory.BuildManyFoods(_defaultObjectsNumber);
+            MapObject._rocks = new List<BaseObstacle>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._rocks.Add(_mapUnitFactory.CreateRock());
+            return this;
         }
 
-        public static List<BaseObstacle> BuildRocks()
-        {
-            return BuildBlueRocks().Concat(BuildRedRocks()).ToList().Concat(BuildGreenRocks()).ToList();
-        }
-
-        public static List<BaseObstacle> BuildBlueRocks()
-        {
-            return _blueUnitFactory.BuildManyRocks(_defaultObjectsNumber);
-        }
-
-        public static List<BaseObstacle> BuildRedRocks()
-        {
-            return _redUnitFactory.BuildManyRocks(_defaultObjectsNumber);
-        }
-
-        public static List<BaseObstacle> BuildGreenRocks()
-        {
-            return _greenUnitFactory.BuildManyRocks(_defaultObjectsNumber);
-        }
     }
 }

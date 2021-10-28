@@ -7,12 +7,14 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 using GameServer.Patterns.Command;
+using GameServer.Patterns;
 
 namespace GameServer.Hubs
 {
 
     public class GameHub : Hub
     {
+        private static ILevelFactory _levelFactory;
         private static Map _map = null;
 
         private static Boolean paused = false;
@@ -21,11 +23,18 @@ namespace GameServer.Hubs
 
         public GameHub() 
         {
+            _levelFactory = new LevelFactory();
             if(_map == null)
             {
-                FileLogger.logger.Log("GameHub started!");
-                _map = MapBuilder.Build();
+                var rand = new Random();
+                GameLevels level = (GameLevels)rand.Next(3);
+                MapBuilder mapBuilder = new MapBuilder(_levelFactory.CreateAbstractUnitFactory(level));
+                _map = mapBuilder.CreateNew().AddFoods(10).AddIslands(10).AddRocks(10).AddSnowBalls(10).MapObject;
+
             }
+
+            FileLogger.logger.Log("GameHub started!");
+
             FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
 
@@ -54,9 +63,6 @@ namespace GameServer.Hubs
         {
              _gameController.Undo(playerId);
         }
-
-        
-
 
         public override async Task OnConnectedAsync()
         {

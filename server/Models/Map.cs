@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using GameServer.Patterns.Strategy;
 
 namespace GameServer.Models
 {
@@ -17,6 +17,12 @@ namespace GameServer.Models
         public Coordinate GetPlayerCoordinateById(string playerId)
         {
             return _players[playerId].Coordinate;
+        }
+
+        public void MoveAllObstacles()
+        {
+            foreach (BaseObstacle obstacle in _rocks)
+                obstacle.TryToMove();
         }
 
         public void UpdatePlayerById(string playerId, Coordinate coordinate)
