@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GameServer.Patterns.Strategy;
 
@@ -13,10 +14,18 @@ namespace GameServer.Models
         public List<Island> _islands { get; set; }
         public List<BaseFood> _foods { get; set; }
         public List<BaseObstacle> _rocks { get; set; }
+        private Timer _gameClock;
+
 
         public Coordinate GetPlayerCoordinateById(string playerId)
         {
+            _gameClock = new Timer(GameTickCallBack, null, 1000, 5000);
             return _players[playerId].Coordinate;
+        }
+
+        private void GameTickCallBack(object sate)
+        {
+            MoveAllObstacles();
         }
 
         public void MoveAllObstacles()

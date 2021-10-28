@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using GameServer.Patterns.Command;
 using GameServer.Patterns;
+using System.Threading;
 
 namespace GameServer.Hubs
 {
@@ -16,7 +17,6 @@ namespace GameServer.Hubs
     {
         private static ILevelFactory _levelFactory;
         private static Map _map = null;
-
         private static Boolean paused = false;
 
         private static GameController _gameController = new GameController();
@@ -37,7 +37,10 @@ namespace GameServer.Hubs
 
             FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
-
+        public async Task UpdateMap()
+        {
+             await Clients.All.SendAsync(HubMethods.MOVE_OBSTACLES, _map);
+        }
         public async Task Move(string playerId, Coordinate coordinate)
         {
             await _gameController.Run(new MoveCommand(playerId, coordinate, _map, Clients), playerId);
