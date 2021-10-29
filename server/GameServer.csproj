@@ -11,11 +11,13 @@
     <Folder Include="Patterns\Abstract Factory\" />
     <Folder Include="Patterns\Strategy\" />
     <Folder Include="Patterns\Factory\" />
+    <Folder Include="Patterns\Adapter\" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Patterns\Abstract Factory\" />
     <None Remove="Patterns\Strategy\" />
     <None Remove="Patterns\Factory\" />
+    <None Remove="Patterns\Adapter\" />
   </ItemGroup>
 </Project>
