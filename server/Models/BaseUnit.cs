@@ -9,7 +9,6 @@ namespace GameServer.Models
 {
     public class BaseUnit
     {
-        public IMoves MoveStrategy { get; set; }
         public ColorTypes Color { get; set; }
         public Coordinate Coordinate { get; set; }
         public Size Size { get; set; }
@@ -19,16 +18,10 @@ namespace GameServer.Models
 
         public BaseUnit(Coordinate coordinate, ColorTypes color)
         {
-            MoveStrategy = new MovesNot();
 
             Coordinate = coordinate;
             Color = color;
             Id = Guid.NewGuid().ToString();
-        }
-
-        public void TryToMove()
-        {
-            Coordinate = MoveStrategy.Move(Coordinate);
         }
 
     }

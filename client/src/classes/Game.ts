@@ -54,6 +54,7 @@ export class Game {
     this.undoBtn = document.getElementById("undo-btn") as HTMLElement;
     this.addJoinListeners();
     this.mainPlayer = new Player(null, true);
+    window.setInterval(() => this.connection.invoke("updateMap"), 500);
 
     this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
     this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
@@ -62,6 +63,24 @@ export class Game {
     this.connection.on("Logout", this.onLogout.bind(this));
     this.connection.on("Pause", this.onPause.bind(this));
     this.connection.on("Resume", this.onResume.bind(this));
+    this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
+  }
+
+  onMoveObstacles(map: IMap) {
+    this.mapObjects.forEach( x => this.onRemoveUnit(x.unit.id));
+    map._foods.forEach((x) => {
+      this.mapObjects.push(new MapObject(x, "food"));
+    });
+    map._rocks.forEach((x) => {
+      this.mapObjects.push(new MapObject(x, "rock"));
+    });
+    map._islands.forEach((x) => {
+      this.mapObjects.push(new MapObject(x, "island"));
+    });
+    map._snowBalls.forEach((x) => {
+      this.mapObjects.push(new MapObject(x, "snowBall"));
+    });
+
   }
 
   onLogout(username: string) {

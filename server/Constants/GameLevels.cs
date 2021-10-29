@@ -1,7 +1,7 @@
 ﻿using System;
 namespace GameServer.Constants
 {
-    public enum GameLevels
+    public enum GameLevels: int
     {
         Easy,
         Medium,

@@ -14,5 +14,6 @@ namespace GameServer.Constants
         public const string PAUSE = "Pause";
         public const string RESUME = "Resume";
         public const string LOGOUT = "Logout";
+        public const string MOVE_OBSTACLES = "MoveObstacles";
     }
 }
