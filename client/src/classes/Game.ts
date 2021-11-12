@@ -44,6 +44,7 @@ export class Game {
   topReached: boolean = false;
   paused: boolean = false;
   lavel: keyof typeof GameLevels | undefined;
+  freezed: boolean = false;
 
   constructor(conn: HubConnection) {
     this.connection = conn;
@@ -89,19 +90,19 @@ export class Game {
 
   renderItems(items: BaseUnit[], container: HTMLElement) {
     items.forEach((x) => {
-      let div = document.createElement("div");
-      div.classList.add("item");
-      div.style.background = colors[x.color];
-      div.style.width = x.size.sizeX + "px";
-      div.style.height = x.size.sizeY + "px";
-      container.appendChild(div);
-
-      if ("items" in x) {
+      if (x.items) {
         let composite = x as Composite;
         let packDiv = document.createElement("div");
         packDiv.className = "pack";
         container.appendChild(packDiv);
         this.renderItems(composite.items, packDiv);
+      } else {
+        let div = document.createElement("div");
+        div.classList.add("item");
+        div.style.background = colors[x.color];
+        div.style.width = x.size.sizeX + "px";
+        div.style.height = x.size.sizeY + "px";
+        container.appendChild(div);
       }
     });
   }
@@ -404,7 +405,7 @@ export class Game {
           dx: changeX,
           dy: changeY,
         } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
-        if (bumped)
+        if (bumped && !this.freezed) {
           if (x.type === "food") {
             this.eat(x.unit as BaseFood);
           } else if (x.type === "box") {
@@ -413,6 +414,15 @@ export class Game {
             change = { x: changeX, y: changeY };
             this.bump(x.unit as BaseObstacle);
           }
+
+          //Freezing reikalingas, kad to pačio itemo nevalgytu kelis kartus, kol per serveri suvaiksto duomenys. Jei kazka geriau sugalvosit pakeiskit.
+          if (["food", "box"].includes(x.type)) {
+            this.freezed = true;
+            setTimeout(() => {
+              this.freezed = false;
+            }, 500);
+          }
+        }
       });
 
       this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${

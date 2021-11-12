@@ -7,6 +7,7 @@ interface BaseUnit {
   size: Size;
   id: string;
   impact: number;
+  items?: BaseUnit[];
 }
 
 export default BaseUnit;

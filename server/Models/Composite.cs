@@ -1,12 +1,13 @@
 ﻿using System;
 using GameServer.Constants;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Linq;
 
 namespace GameServer.Models
 {
     public class Composite: BaseUnit
     {
-        public List<BaseUnit> Items  { get; set; }
         public Composite(Coordinate coordinate, ColorTypes color) : base(coordinate, color)
         {
             Items = new List<BaseUnit>();

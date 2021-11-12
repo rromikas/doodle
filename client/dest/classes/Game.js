@@ -31,6 +31,7 @@ export class Game {
         this.initialMapSet = false;
         this.topReached = false;
         this.paused = false;
+        this.freezed = false;
         this.connection = conn;
         this.addCommandListeners();
         this.mapNode = document.getElementById("map");
@@ -46,7 +47,7 @@ export class Game {
         this.itemsNode = document.getElementById("items-holder");
         this.addJoinListeners();
         this.mainPlayer = new Player(null, true);
-        // window.setInterval(() => this.connection.invoke("updateMap"), 500);
+        window.setInterval(() => this.connection.invoke("updateMap"), 500);
         this.connection.on("AllInfo", this.onAllInfo.bind(this));
         this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
         this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
@@ -70,18 +71,20 @@ export class Game {
     }
     renderItems(items, container) {
         items.forEach((x) => {
-            let div = document.createElement("div");
-            div.className = "item";
-            div.style.background = colors[x.color];
-            div.style.width = x.size.sizeX + "px";
-            div.style.height = x.size.sizeY + "px";
-            container.appendChild(div);
-            if ("items" in x) {
+            if (x.items) {
                 let composite = x;
                 let packDiv = document.createElement("div");
                 packDiv.className = "pack";
                 container.appendChild(packDiv);
                 this.renderItems(composite.items, packDiv);
+            }
+            else {
+                let div = document.createElement("div");
+                div.classList.add("item");
+                div.style.background = colors[x.color];
+                div.style.width = x.size.sizeX + "px";
+                div.style.height = x.size.sizeY + "px";
+                container.appendChild(div);
             }
         });
     }
@@ -343,7 +346,7 @@ export class Game {
             let change = { x: 0, y: 0 };
             this.mapObjects.forEach((x) => {
                 let { bumped, dx: changeX, dy: changeY, } = this.doObjectsOverlap(x.unit, { x: potentialX, y: potentialY });
-                if (bumped)
+                if (bumped && !this.freezed) {
                     if (x.type === "food") {
                         this.eat(x.unit);
                     }
@@ -354,6 +357,14 @@ export class Game {
                         change = { x: changeX, y: changeY };
                         this.bump(x.unit);
                     }
+                    //Freezing reikalingas, kad to pačio itemo nevalgytu kelis kartus, kol per serveri suvaiksto duomenys. Jei kazka geriau sugalvosit pakeiskit.
+                    if (["food", "box"].includes(x.type)) {
+                        this.freezed = true;
+                        setTimeout(() => {
+                            this.freezed = false;
+                        }, 500);
+                    }
+                }
             });
             this.mainPlayer.node.style.transform = `translate(${newX + change.x}px, ${newY + (dy ? -change.y : 0)}px)`;
             this.mapNode.style.transform = `translateY(${mapY + mapDy + (mapDy ? change.y : 0)}px)`;
