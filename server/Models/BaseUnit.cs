@@ -16,6 +16,8 @@ namespace GameServer.Models
 
         public int Impact { get; set; }
 
+        public List<BaseUnit> Items { get; set; }
+
         public BaseUnit(Coordinate coordinate, ColorTypes color)
         {
 

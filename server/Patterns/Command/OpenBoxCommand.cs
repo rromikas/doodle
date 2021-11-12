@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace GameServer.Patterns.Command
 {
@@ -28,6 +29,8 @@ namespace GameServer.Patterns.Command
             box = _map.RemoveBox(_boxId);
             _map._players[_playerId].AddItem(box);
             box.Id = _boxId;
+
+
             await _clients.All.SendAsync(HubMethods.ALL_INFO, _map);
             FileLogger.logger.Log(String.Format("Box with id '{0}' was opened! ", _boxId));
         }
