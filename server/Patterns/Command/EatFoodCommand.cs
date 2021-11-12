@@ -26,15 +26,17 @@ namespace GameServer.Patterns.Command
         public override async Task Execute()
         {
             food = _map.RemoveFood(_foodId);
+            _map._players[_playerId].AddItem(food);
             food.Id = _foodId;
-            await _clients.All.SendAsync(HubMethods.REMOVE_UNIT, _foodId);
+            await _clients.All.SendAsync(HubMethods.ALL_INFO, _map);
             FileLogger.logger.Log(String.Format("Food with id '{0}' was eaten! ", _foodId));
         }
 
         public override async Task Undo()
         {
+            _map._players[_playerId].RemoveItem(food.Id);
             _map.AddFood(food);
-            await _clients.All.SendAsync(HubMethods.ADD_UNIT, food, _playerId);
+            await _clients.All.SendAsync(HubMethods.ALL_INFO, _map);
             FileLogger.logger.Log(String.Format("Food with id '{0}' was added! ", _foodId));
         }
     }

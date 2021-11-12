@@ -7,7 +7,6 @@
   <ItemGroup>
     <Folder Include="Constants\" />
     <Folder Include="Logs\" />
-    <Folder Include="Models\" />
     <Folder Include="Patterns\Abstract Factory\" />
     <Folder Include="Patterns\Strategy\" />
     <Folder Include="Patterns\Factory\" />

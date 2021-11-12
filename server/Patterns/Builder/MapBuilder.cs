@@ -13,9 +13,9 @@ namespace GameServer.Patterns.Builder
         private readonly IUnitAbstractFactory _mapUnitFactory;
 
 
-        public MapBuilder (IUnitAbstractFactory mapUnitFactory)
+        public MapBuilder(GameLevels level)
         {
-            _mapUnitFactory = mapUnitFactory;
+            _mapUnitFactory = new LevelFactory().CreateAbstractUnitFactory(level);
         }
 
         public MapBuilder CreateNew()
@@ -51,6 +51,14 @@ namespace GameServer.Patterns.Builder
                 MapObject._rocks.Add(_mapUnitFactory.CreateRock());
             return this;
         }
+        public MapBuilder AddBoxes(int quantity)
+        {
+            MapObject._boxes = new List<Box>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._boxes = BoxBuilder.BuildMany(quantity, MapObject._foods.Cast<BaseUnit>().ToList());
+            return this;
+        }
+
 
     }
 }

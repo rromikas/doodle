@@ -15,28 +15,28 @@ namespace GameServer.Hubs
 
     public class GameHub : Hub
     {
-        private static ILevelFactory _levelFactory;
         private static Map _map = null;
         private static Boolean paused = false;
-
         private static GameController _gameController = new GameController();
+        private static Nullable<GameLevels> level = null;
 
         public GameHub() 
         {
-            _levelFactory = new LevelFactory();
-            if(_map == null)
-            {
-                var rand = new Random();
-                GameLevels level = (GameLevels)rand.Next(3);
-                MapBuilder mapBuilder = new MapBuilder(_levelFactory.CreateAbstractUnitFactory(level));
-                _map = mapBuilder.CreateNew().AddFoods(10).AddIslands(10).AddRocks(10).AddSnowBalls(10).MapObject;
-
-            }
-
             FileLogger.logger.Log("GameHub started!");
-
             FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
+
+        public void SetLevel(GameLevels lvl)
+        {
+            if (_map == null)
+            {
+                level = lvl;
+                MapBuilder mapBuilder = new MapBuilder(lvl);
+                _map = mapBuilder.CreateNew().AddFoods(10).AddIslands(10).AddRocks(10).AddSnowBalls(10).AddBoxes(10).MapObject;
+                Clients.All.SendAsync(HubMethods.SET_LEVEL, lvl);
+            }
+        }
+
         public async Task UpdateMap()
         {
              await Clients.All.SendAsync(HubMethods.MOVE_OBSTACLES, _map);
@@ -56,6 +56,11 @@ namespace GameServer.Hubs
             await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients), playerId);
         }
 
+        public async Task OpenBox(string playerId, string boxId)
+        {
+            await _gameController.Run(new OpenBoxCommand(playerId, boxId, _map, Clients), playerId);
+        }
+
         public async Task Pause(string playerId)
         {
             await _gameController.Run(new PauseCommand(playerId, _map, Clients), playerId);
@@ -69,7 +74,7 @@ namespace GameServer.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
+            await Clients.All.SendAsync("UserConnected", level);
             await base.OnConnectedAsync();
         }
 

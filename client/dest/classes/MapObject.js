@@ -7,7 +7,6 @@ class MapObject {
         this.node = document.createElement("div");
         this.node.classList.add("mapObject");
         this.node.classList.add(type);
-        this.node.style.borderRadius = "50%";
         this.node.style.left = `${u.coordinate.x}px`;
         this.node.style.bottom = `${u.coordinate.y}px`;
         this.node.style.background = colors[u.color];
