@@ -1,6 +1,16 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { getRandomInt } from "../helper.js";
 import Player from "./Player.js";
 import MapObject from "./MapObject.js";
+import { colors, GameLevels } from "../constants/index.js";
 export class Game {
     constructor(conn) {
         this.pressedKeys = {
@@ -16,7 +26,7 @@ export class Game {
             ArrowLeft: () => -this.speed,
             ArrowRight: () => this.speed,
         };
-        this.players = {};
+        this.players = [];
         this.mapObjects = [];
         this.initialMapSet = false;
         this.topReached = false;
@@ -30,10 +40,14 @@ export class Game {
         this.scoreNode.innerHTML = "100";
         this.speedNode = document.getElementById("speed");
         this.speedNode.innerHTML = this.speed.toString();
+        this.levelNode = document.getElementById("level");
         this.pauseBtn = document.getElementById("pause-btn");
         this.undoBtn = document.getElementById("undo-btn");
+        this.itemsNode = document.getElementById("items-holder");
         this.addJoinListeners();
         this.mainPlayer = new Player(null, true);
+        // window.setInterval(() => this.connection.invoke("updateMap"), 500);
+        this.connection.on("AllInfo", this.onAllInfo.bind(this));
         this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
         this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
         this.connection.on("RemoveUnit", this.onRemoveUnit.bind(this));
@@ -41,57 +55,55 @@ export class Game {
         this.connection.on("Logout", this.onLogout.bind(this));
         this.connection.on("Pause", this.onPause.bind(this));
         this.connection.on("Resume", this.onResume.bind(this));
+        this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
+        this.connection.on("UserConnected", this.onUserConnected.bind(this));
+        this.connection.on("SetLevel", this.onSetLevel.bind(this));
     }
-    onLogout(username) {
-        var _a;
-        if (this.mainPlayer.userName === username) {
-            window.location.reload();
-        }
-        else {
-            if (username in this.players) {
-                let node = this.players[username].node;
-                (_a = node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(node);
-                delete this.players[username];
-            }
-        }
+    onAllInfo(map) {
+        console.log("ALL INFO", map);
+        this.rerenderMapObjects(map);
+        this.rerenderPlayers(map);
     }
-    onUndo() {
-        this.connection.invoke("undo", this.mainPlayer.userName);
+    startRenderingItems() {
+        this.itemsNode.innerHTML = "";
+        this.renderItems(this.mainPlayer.items, this.itemsNode);
     }
-    onRemoveUnit(unitId) {
-        var _a;
-        let foundIndex = this.mapObjects.findIndex((x) => x.unit.id === unitId);
-        if (foundIndex === -1)
-            return;
-        let found = this.mapObjects[foundIndex];
-        (_a = found.node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(found.node);
-        this.mapObjects.splice(foundIndex, 1);
-    }
-    onAddUnit(unit, username) {
-        this.mapObjects.push(new MapObject(unit, "food"));
-        if (username === this.mainPlayer.userName) {
-            this.changeSpeed(-unit.impact);
-        }
-    }
-    onPlayerMoveInfo(username, coordinate, undo) {
-        if (username in this.players) {
-            this.players[username].setCoordinate(coordinate);
-        }
-        if (username === this.mainPlayer.userName && undo) {
-            this.mainPlayer.setCoordinate(coordinate);
-        }
-    }
-    onPlayersInfo(map) {
-        if (!this.initialMapSet) {
-            this.initializeMap(map);
-        }
-        Object.keys(map._players).forEach((username) => {
-            if (!(username in this.players) && username !== this.mainPlayer.userName) {
-                this.players[username] = new Player(map._players[username]);
+    renderItems(items, container) {
+        items.forEach((x) => {
+            let div = document.createElement("div");
+            div.className = "item";
+            div.style.background = colors[x.color];
+            div.style.width = x.size.sizeX + "px";
+            div.style.height = x.size.sizeY + "px";
+            container.appendChild(div);
+            if ("items" in x) {
+                let composite = x;
+                let packDiv = document.createElement("div");
+                packDiv.className = "pack";
+                container.appendChild(packDiv);
+                this.renderItems(composite.items, packDiv);
             }
         });
     }
-    initializeMap(map) {
+    onUserConnected(gameLevel) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (gameLevel == null) {
+                const res = yield window.prompt("Select game level (0,1,2)");
+                if (res) {
+                    this.connection.invoke("setLevel", +res);
+                }
+            }
+            else {
+                this.onSetLevel(gameLevel);
+            }
+        });
+    }
+    onSetLevel(gameLevel) {
+        this.lavel = gameLevel;
+        this.levelNode.innerHTML = GameLevels[gameLevel];
+    }
+    rerenderMapObjects(map) {
+        this.mapObjects.forEach((x) => this.onRemoveUnit(x.unit.id));
         map._foods.forEach((x) => {
             this.mapObjects.push(new MapObject(x, "food"));
         });
@@ -104,6 +116,82 @@ export class Game {
         map._snowBalls.forEach((x) => {
             this.mapObjects.push(new MapObject(x, "snowBall"));
         });
+        map._boxes.forEach((x) => {
+            this.mapObjects.push(new MapObject(x, "box"));
+        });
+    }
+    onMoveObstacles(map) {
+        this.rerenderMapObjects(map);
+    }
+    onLogout(username) {
+        if (this.mainPlayer.userName === username) {
+            window.location.reload();
+        }
+        else {
+            this.onRemovePlayer(username);
+        }
+    }
+    onUndo() {
+        this.connection.invoke("undo", this.mainPlayer.userName);
+    }
+    onRemovePlayer(username) {
+        var _a;
+        let index = this.players.findIndex((x) => x.userName === username);
+        if (index !== -1) {
+            let node = this.players[index].node;
+            (_a = node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(node);
+            this.players.splice(index, 1);
+        }
+    }
+    onRemoveUnit(unitId) {
+        var _a;
+        let foundIndex = this.mapObjects.findIndex((x) => x.unit.id === unitId);
+        if (foundIndex === -1)
+            return;
+        let found = this.mapObjects[foundIndex];
+        this.mapObjects.splice(foundIndex, 1);
+        (_a = found.node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(found.node);
+    }
+    onAddUnit(unit, username) {
+        this.mapObjects.push(new MapObject(unit, "food"));
+        if (username === this.mainPlayer.userName) {
+            this.changeSpeed(-unit.impact);
+        }
+    }
+    onPlayerMoveInfo(username, coordinate, undo) {
+        if (username in this.players) {
+            let index = this.players.findIndex((x) => x.userName === username);
+            if (index !== -1) {
+                this.players[index].setCoordinate(coordinate);
+            }
+        }
+        if (username === this.mainPlayer.userName && undo) {
+            this.mainPlayer.setCoordinate(coordinate);
+        }
+    }
+    onPlayersInfo(map) {
+        if (!this.initialMapSet) {
+            this.initializeMap(map);
+        }
+        this.rerenderPlayers(map);
+    }
+    rerenderPlayers(map) {
+        this.players.forEach((x) => {
+            this.onRemovePlayer(x.userName);
+        });
+        Object.keys(map._players).forEach((username) => {
+            let player = map._players[username];
+            if (username !== this.mainPlayer.userName) {
+                this.players.push(new Player(player));
+            }
+            else {
+                this.mainPlayer.items = player.items;
+                this.startRenderingItems();
+            }
+        });
+    }
+    initializeMap(map) {
+        this.rerenderMapObjects(map);
         this.initialMapSet = true;
     }
     addJoinListeners() {
@@ -129,6 +217,7 @@ export class Game {
             size: { sizeX: 80, sizeY: 80 },
             id: Math.random().toString(),
             impact: 0,
+            items: [],
         }, true);
         this.connection
             .invoke("login", this.mainPlayer.userName, this.mainPlayer.coordinate)
@@ -179,6 +268,9 @@ export class Game {
         this.changeSpeed(foodObject.impact);
     }
     bump(obstacle) { }
+    openBox(box) {
+        this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
+    }
     doObjectsOverlap(unit, coordinate) {
         const { x: ux, y: uy } = unit.coordinate;
         const { x: px, y: py } = coordinate;
@@ -254,6 +346,9 @@ export class Game {
                 if (bumped)
                     if (x.type === "food") {
                         this.eat(x.unit);
+                    }
+                    else if (x.type === "box") {
+                        this.openBox(x.unit);
                     }
                     else {
                         change = { x: changeX, y: changeY };

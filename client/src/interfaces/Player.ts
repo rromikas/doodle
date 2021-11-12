@@ -1,7 +1,6 @@
-import BaseUnit from "./BaseUnit";
-import Coordinate from "./Coordinate";
+import Composite from "./Composite";
 
-interface Player extends BaseUnit {
+interface Player extends Composite {
   userName: string;
 }
 

@@ -6,3 +6,9 @@ export const colors = {
   4: "deepskyblue",
   5: "brown",
 };
+
+export const GameLevels = {
+  0: "Easy",
+  1: "Medium",
+  2: "Hard",
+};

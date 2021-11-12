@@ -7,6 +7,8 @@ import BaseFood from "../interfaces/BaseFood.js";
 import BaseObstacle from "../interfaces/BaseObstacle";
 import Coordinate from "../interfaces/Coordinate";
 import BaseUnit from "../interfaces/BaseUnit";
+import { colors, GameLevels } from "../constants/index.js";
+import Composite from "../interfaces/Composite";
 
 type MoveKey = "ArrowDown" | "ArrowUp" | "ArrowLeft" | "ArrowRight";
 
@@ -28,17 +30,20 @@ export class Game {
   mapNode: HTMLElement;
   scoreNode: HTMLElement;
   speedNode: HTMLElement;
+  levelNode: HTMLElement;
   pauseBtn: HTMLElement;
   undoBtn: HTMLElement;
+  itemsNode: HTMLElement;
   movingInterval: NodeJS.Timeout | undefined;
   screenHeight: number;
   mapHeight: number;
-  players: { [username: string]: Player } = {};
+  players: Player[] = [];
   mapObjects: MapObject[] = [];
   initialMapSet: boolean = false;
   mainPlayer: Player;
   topReached: boolean = false;
   paused: boolean = false;
+  lavel: keyof typeof GameLevels | undefined;
 
   constructor(conn: HubConnection) {
     this.connection = conn;
@@ -50,12 +55,15 @@ export class Game {
     this.scoreNode.innerHTML = "100";
     this.speedNode = document.getElementById("speed") as HTMLElement;
     this.speedNode.innerHTML = this.speed.toString();
+    this.levelNode = document.getElementById("level") as HTMLElement;
     this.pauseBtn = document.getElementById("pause-btn") as HTMLElement;
     this.undoBtn = document.getElementById("undo-btn") as HTMLElement;
+    this.itemsNode = document.getElementById("items-holder") as HTMLElement;
     this.addJoinListeners();
     this.mainPlayer = new Player(null, true);
     window.setInterval(() => this.connection.invoke("updateMap"), 500);
 
+    this.connection.on("AllInfo", this.onAllInfo.bind(this));
     this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
     this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
     this.connection.on("RemoveUnit", this.onRemoveUnit.bind(this));
@@ -64,10 +72,58 @@ export class Game {
     this.connection.on("Pause", this.onPause.bind(this));
     this.connection.on("Resume", this.onResume.bind(this));
     this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
+    this.connection.on("UserConnected", this.onUserConnected.bind(this));
+    this.connection.on("SetLevel", this.onSetLevel.bind(this));
   }
 
-  onMoveObstacles(map: IMap) {
-    this.mapObjects.forEach( x => this.onRemoveUnit(x.unit.id));
+  onAllInfo(map: IMap) {
+    console.log("ALL INFO", map);
+    this.rerenderMapObjects(map);
+    this.rerenderPlayers(map);
+  }
+
+  startRenderingItems() {
+    this.itemsNode.innerHTML = "";
+    this.renderItems(this.mainPlayer.items, this.itemsNode);
+  }
+
+  renderItems(items: BaseUnit[], container: HTMLElement) {
+    items.forEach((x) => {
+      let div = document.createElement("div");
+      div.classList.add("item");
+      div.style.background = colors[x.color];
+      div.style.width = x.size.sizeX + "px";
+      div.style.height = x.size.sizeY + "px";
+      container.appendChild(div);
+
+      if ("items" in x) {
+        let composite = x as Composite;
+        let packDiv = document.createElement("div");
+        packDiv.className = "pack";
+        container.appendChild(packDiv);
+        this.renderItems(composite.items, packDiv);
+      }
+    });
+  }
+
+  async onUserConnected(gameLevel: keyof typeof GameLevels | null) {
+    if (gameLevel == null) {
+      const res = await window.prompt("Select game level (0,1,2)");
+      if (res) {
+        this.connection.invoke("setLevel", +res);
+      }
+    } else {
+      this.onSetLevel(gameLevel);
+    }
+  }
+
+  onSetLevel(gameLevel: keyof typeof GameLevels) {
+    this.lavel = gameLevel;
+    this.levelNode.innerHTML = GameLevels[gameLevel];
+  }
+
+  rerenderMapObjects(map: IMap) {
+    this.mapObjects.forEach((x) => this.onRemoveUnit(x.unit.id));
     map._foods.forEach((x) => {
       this.mapObjects.push(new MapObject(x, "food"));
     });
@@ -80,18 +136,20 @@ export class Game {
     map._snowBalls.forEach((x) => {
       this.mapObjects.push(new MapObject(x, "snowBall"));
     });
+    map._boxes.forEach((x) => {
+      this.mapObjects.push(new MapObject(x, "box"));
+    });
+  }
 
+  onMoveObstacles(map: IMap) {
+    this.rerenderMapObjects(map);
   }
 
   onLogout(username: string) {
     if (this.mainPlayer.userName === username) {
       window.location.reload();
     } else {
-      if (username in this.players) {
-        let node = this.players[username].node;
-        node.parentNode?.removeChild(node);
-        delete this.players[username];
-      }
+      this.onRemovePlayer(username);
     }
   }
 
@@ -99,12 +157,21 @@ export class Game {
     this.connection.invoke("undo", this.mainPlayer.userName);
   }
 
+  onRemovePlayer(username: string) {
+    let index = this.players.findIndex((x) => x.userName === username);
+    if (index !== -1) {
+      let node = this.players[index].node;
+      node.parentNode?.removeChild(node);
+      this.players.splice(index, 1);
+    }
+  }
+
   onRemoveUnit(unitId: string) {
     let foundIndex = this.mapObjects.findIndex((x) => x.unit.id === unitId);
     if (foundIndex === -1) return;
     let found = this.mapObjects[foundIndex];
-    found.node.parentNode?.removeChild(found.node);
     this.mapObjects.splice(foundIndex, 1);
+    found.node.parentNode?.removeChild(found.node);
   }
 
   onAddUnit(unit: BaseUnit, username: string) {
@@ -116,7 +183,10 @@ export class Game {
 
   onPlayerMoveInfo(username: string, coordinate: Coordinate, undo: boolean) {
     if (username in this.players) {
-      this.players[username].setCoordinate(coordinate);
+      let index = this.players.findIndex((x) => x.userName === username);
+      if (index !== -1) {
+        this.players[index].setCoordinate(coordinate);
+      }
     }
 
     if (username === this.mainPlayer.userName && undo) {
@@ -128,26 +198,27 @@ export class Game {
     if (!this.initialMapSet) {
       this.initializeMap(map);
     }
+    this.rerenderPlayers(map);
+  }
+
+  rerenderPlayers(map: IMap) {
+    this.players.forEach((x) => {
+      this.onRemovePlayer(x.userName);
+    });
+
     Object.keys(map._players).forEach((username) => {
-      if (!(username in this.players) && username !== this.mainPlayer.userName) {
-        this.players[username] = new Player(map._players[username]);
+      let player = map._players[username];
+      if (username !== this.mainPlayer.userName) {
+        this.players.push(new Player(player));
+      } else {
+        this.mainPlayer.items = player.items;
+        this.startRenderingItems();
       }
     });
   }
 
   initializeMap(map: IMap) {
-    map._foods.forEach((x) => {
-      this.mapObjects.push(new MapObject(x, "food"));
-    });
-    map._rocks.forEach((x) => {
-      this.mapObjects.push(new MapObject(x, "rock"));
-    });
-    map._islands.forEach((x) => {
-      this.mapObjects.push(new MapObject(x, "island"));
-    });
-    map._snowBalls.forEach((x) => {
-      this.mapObjects.push(new MapObject(x, "snowBall"));
-    });
+    this.rerenderMapObjects(map);
     this.initialMapSet = true;
   }
 
@@ -175,6 +246,7 @@ export class Game {
         size: { sizeX: 80, sizeY: 80 },
         id: Math.random().toString(),
         impact: 0,
+        items: [],
       },
       true
     );
@@ -235,6 +307,10 @@ export class Game {
   }
 
   bump(obstacle: BaseObstacle) {}
+
+  openBox(box: BaseUnit) {
+    this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
+  }
 
   doObjectsOverlap(
     unit: BaseUnit,
@@ -331,6 +407,8 @@ export class Game {
         if (bumped)
           if (x.type === "food") {
             this.eat(x.unit as BaseFood);
+          } else if (x.type === "box") {
+            this.openBox(x.unit);
           } else {
             change = { x: changeX, y: changeY };
             this.bump(x.unit as BaseObstacle);

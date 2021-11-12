@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GameServer.Models
 {
-    public class Player: BaseUnit
+    public class Player: Composite
     {
         public string UserName { get; set; }
         public int Score { get; set; }

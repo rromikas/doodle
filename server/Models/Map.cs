@@ -14,6 +14,10 @@ namespace GameServer.Models
         public List<Island> _islands { get; set; }
         public List<BaseFood> _foods { get; set; }
         public List<BaseObstacle> _rocks { get; set; }
+
+
+        public List<Box> _boxes { get; set; }
+
         private Timer _gameClock;
 
 
@@ -60,6 +64,23 @@ namespace GameServer.Models
             }
            
             return new BlueFood(new Coordinate());
+        }
+
+        public Box RemoveBox(string boxId)
+        {
+            var box = _boxes.Find(x => x.Id.CompareTo(boxId) == 0);
+            if (box != null)
+            {
+                _boxes.Remove(box);
+                return box;
+            }
+
+            return new Box(new List<BaseUnit>());
+        }
+
+        public void AddBox(Box box)
+        {
+            _boxes.Add(box);
         }
 
         public void AddFood(BaseFood food)

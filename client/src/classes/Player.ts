@@ -1,3 +1,4 @@
+import BaseUnit from "../interfaces/BaseUnit";
 import IPlayer from "../interfaces/Player";
 import Size from "../interfaces/Size";
 
@@ -12,6 +13,7 @@ class Player implements IPlayer {
   id: string;
   isMain: boolean;
   impact: number;
+  items: BaseUnit[] = [];
 
   constructor(u: IPlayer | null, isMain: boolean = false) {
     let unit = u || {

@@ -1,6 +1,7 @@
 class Player {
     constructor(u, isMain = false) {
         var _a;
+        this.items = [];
         let unit = u || {
             userName: "",
             size: { sizeX: 0, sizeY: 0 },
