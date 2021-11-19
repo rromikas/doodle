@@ -3,7 +3,7 @@ import { Game } from "./classes/Game.js";
 
 declare var signalR: typeof SignalR;
 
-const urls = ["http://localhost:5000/gameHub"];
+const urls = ["http://192.168.1.137:5000/gameHub", "http://localhost:5000/gameHub"];
 
 //builConnection method tries different url to build connection. To some urls can be connected from different machines.
 const buildConnection = (urlIndex: number = 0): Promise<SignalR.HubConnection> => {
