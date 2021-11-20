@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
 using System.Text.Json;
-
-
+using GameServer.Patterns.Command;
+using GameServer.Patterns;
+using System.Threading;
 
 namespace GameServer.Hubs
 {
@@ -15,32 +16,65 @@ namespace GameServer.Hubs
     public class GameHub : Hub
     {
         private static Map _map = null;
+        private static Boolean paused = false;
+        private static GameController _gameController = new GameController();
+        private static Nullable<GameLevels> level = null;
+
         public GameHub() 
         {
-            if(_map == null)
-            {
-                FileLogger.logger.Log("GameHub started!");
-                _map = MapBuilder.Build();
-            }
-            
+            FileLogger.logger.Log("GameHub started!");
+            FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
 
+        public void SetLevel(GameLevels lvl)
+        {
+            if (_map == null)
+            {
+                level = lvl;
+                MapBuilder mapBuilder = new MapBuilder(lvl);
+                _map = mapBuilder.CreateNew().AddFoods(10).AddIslands(10).AddRocks(10).AddSnowBalls(10).AddBoxes(10).MapObject;
+                Clients.All.SendAsync(HubMethods.SET_LEVEL, lvl);
+            }
+        }
+
+        public async Task UpdateMap()
+        {
+             await Clients.All.SendAsync(HubMethods.MOVE_OBSTACLES, _map);
+        }
         public async Task Move(string playerId, Coordinate coordinate)
         {
-            _map.UpdatePlayerById(playerId, coordinate);
-            await Clients.All.SendAsync(HubMethods.PLAYER_MOVE_INFO, playerId, coordinate, _map);
+            await _gameController.Run(new MoveCommand(playerId, coordinate, _map, Clients), playerId);
         }
 
         public async Task Login(string playerId, Coordinate coordinate)
         {
-            _map.AddNewPlayer(playerId, coordinate);
-            await Clients.All.SendAsync(HubMethods.ALL_PLAYERS_INFO, _map);
-            FileLogger.logger.Log(String.Format("New player with id: '{0}' joyned! ", playerId));
+            await _gameController.Run(new LoginCommand(playerId, coordinate, _map, Clients), playerId);
+        }
+
+        public async Task Eat(string playerId, string foodId)
+        {
+            await _gameController.Run(new EatFoodCommand(playerId, foodId, _map, Clients), playerId);
+        }
+
+        public async Task OpenBox(string playerId, string boxId)
+        {
+            await _gameController.Run(new OpenBoxCommand(playerId, boxId, _map, Clients), playerId);
+        }
+
+        public async Task Pause(string playerId)
+        {
+            await _gameController.Run(new PauseCommand(playerId, _map, Clients), playerId);
+            paused = !paused;
+        }
+
+        public void Undo(string playerId)
+        {
+             _gameController.Undo(playerId);
         }
 
         public override async Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
+            await Clients.All.SendAsync("UserConnected", level);
             await base.OnConnectedAsync();
         }
 

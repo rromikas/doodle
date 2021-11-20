@@ -5,14 +5,16 @@ using System.Threading.Tasks;
 
 namespace GameServer.Models
 {
-    public class Player: BaseUnit
+    public class Player: Composite
     {
         public string UserName { get; set; }
         public int Score { get; set; }
+        public int Speed { get; set; } = 10;
        
         public Player(string userName): base(new Coordinate(), Constants.ColorTypes.Black)
         {
             UserName = userName;
+            Size = new Size(50, 50);
         }
     }
 }

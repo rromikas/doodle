@@ -1,0 +1,115 @@
+[
+  {
+    "Items": [
+      {
+        "Color": 2,
+        "Coordinate": { "X": 212, "Y": 2684 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "7fd07b83-dbca-418d-ad98-b6cd4c63c2b9",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 80, "Y": 4154 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "89accc6c-4cf8-40c9-a609-fb45221fb24f",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 560, "Y": 6120 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "50383cea-9c04-45f1-aef8-52ae20f26f3d",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 714, "Y": 4182 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "b34c28f1-3eb4-4b87-bad1-cdfd190cea34",
+        "Impact": 3
+      }
+    ],
+    "Color": 5,
+    "Coordinate": { "X": 737, "Y": 98 },
+    "Size": { "SizeX": 50, "SizeY": 50 },
+    "Id": "a6f78177-6365-4212-b6da-50816628393c",
+    "Impact": 0
+  },
+  {
+    "Items": [
+      {
+        "Color": 2,
+        "Coordinate": { "X": 212, "Y": 2684 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "7fd07b83-dbca-418d-ad98-b6cd4c63c2b9",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 80, "Y": 4154 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "89accc6c-4cf8-40c9-a609-fb45221fb24f",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 560, "Y": 6120 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "50383cea-9c04-45f1-aef8-52ae20f26f3d",
+        "Impact": 3
+      },
+      {
+        "Color": 2,
+        "Coordinate": { "X": 714, "Y": 4182 },
+        "Size": { "SizeX": 20, "SizeY": 20 },
+        "Id": "b34c28f1-3eb4-4b87-bad1-cdfd190cea34",
+        "Impact": 3
+      }
+    ],
+    "Color": 5,
+    "Coordinate": { "X": 737, "Y": 98 },
+    "Size": { "SizeX": 50, "SizeY": 50 },
+    "Id": "a6f78177-6365-4212-b6da-50816628393c",
+    "Impact": 0
+  },
+  [
+    {
+      "Items": [
+        {
+          "Color": 2,
+          "Coordinate": { "X": 212, "Y": 2684 },
+          "Size": { "SizeX": 20, "SizeY": 20 },
+          "Id": "7fd07b83-dbca-418d-ad98-b6cd4c63c2b9",
+          "Impact": 3
+        },
+        {
+          "Color": 2,
+          "Coordinate": { "X": 80, "Y": 4154 },
+          "Size": { "SizeX": 20, "SizeY": 20 },
+          "Id": "89accc6c-4cf8-40c9-a609-fb45221fb24f",
+          "Impact": 3
+        },
+        {
+          "Color": 2,
+          "Coordinate": { "X": 560, "Y": 6120 },
+          "Size": { "SizeX": 20, "SizeY": 20 },
+          "Id": "50383cea-9c04-45f1-aef8-52ae20f26f3d",
+          "Impact": 3
+        },
+        {
+          "Color": 2,
+          "Coordinate": { "X": 714, "Y": 4182 },
+          "Size": { "SizeX": 20, "SizeY": 20 },
+          "Id": "b34c28f1-3eb4-4b87-bad1-cdfd190cea34",
+          "Impact": 3
+        }
+      ],
+      "Color": 5,
+      "Coordinate": { "X": 737, "Y": 98 },
+      "Size": { "SizeX": 50, "SizeY": 50 },
+      "Id": "a6f78177-6365-4212-b6da-50816628393c",
+      "Impact": 0
+    }
+  ]
+]

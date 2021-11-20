@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GameServer.Patterns.Adapter;
 
 namespace GameServer.Models.Singleton
 {
@@ -13,23 +14,19 @@ namespace GameServer.Models.Singleton
         readonly object lockObj = new object();
         string filePath = Path.GetFullPath(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, @"./server/Logs/log.log"));
 
+        readonly IOutputOperations output = new FileOutputAdapter();
 
         public void Log(string message)
         {
             lock (lockObj)
             {
-                using (StreamWriter streamWriter = new StreamWriter(filePath))
-                {
-                    streamWriter.WriteLine(String.Format("[{0}] - {1}", DateTime.Now.ToString(), message));
-                    streamWriter.Close();
-                }
+                output.Write(message);
             }
         }
 
         private class SingletonHolder
         {
             static SingletonHolder() {
-               Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, @"./server/Logs")));
             }
 
             internal static readonly FileLogger _instance = new FileLogger();

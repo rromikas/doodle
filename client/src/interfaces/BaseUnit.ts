@@ -1,9 +1,13 @@
 import Coordinate from "./Coordinate";
+import Size from "./Size";
 
 interface BaseUnit {
-  color: string;
+  color: 0 | 1 | 2 | 3;
   coordinate: Coordinate;
-  size: number;
+  size: Size;
+  id: string;
+  impact: number;
+  items?: BaseUnit[];
 }
 
 export default BaseUnit;

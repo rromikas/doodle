@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace GameServer.Patterns.Builder
 {
-    public class SnowBallBuilder
+    public static class SnowBallBuilder
     {
-        public SnowBall BuildSingle()
+        public static SnowBall BuildSingle()
         {
             return new SnowBall(Coordinate.GenerateRandom());
         }      
 
-        public List<SnowBall> BuildMany(int Quantity)
+        public static List<SnowBall> BuildMany(int Quantity)
         {
             List<SnowBall> SnowBalls = new List<SnowBall>();
             for (int i = 0; i < Quantity; i++)

@@ -6,14 +6,14 @@ namespace GameServer.Patterns
 {
     public class BlueUnitFactory : IUnitAbstractFactory
     {
-        public BaseUnit CreateFood()
+        public BaseFood CreateFood()
         {
             return new BlueFood(Coordinate.GenerateRandom());
         }
 
-        public List<BaseUnit> BuildManyFoods(int Quantity)
+        public List<BaseFood> BuildManyFoods(int Quantity)
         {
-            List<BaseUnit> Foods = new List<BaseUnit>();
+            List<BaseFood> Foods = new List<BaseFood>();
             for (int i = 0; i < Quantity; i++)
             {
                 Foods.Add(CreateFood());
@@ -22,17 +22,17 @@ namespace GameServer.Patterns
             return Foods;
         }
 
-        public BaseUnit CreateRock()
+        public BaseObstacle CreateRock()
         {
             return new BlueRock(Coordinate.GenerateRandom());
         }
 
-        public List<BaseUnit> BuildManyRocks(int Quantity)
+        public List<BaseObstacle> BuildManyRocks(int Quantity)
         {
-            List<BaseUnit> Rocks = new List<BaseUnit>();
+            List<BaseObstacle> Rocks = new List<BaseObstacle>();
             for (int i = 0; i < Quantity; i++)
             {
-                Rocks.Add(CreateFood());
+                Rocks.Add(CreateRock());
             }
 
             return Rocks;

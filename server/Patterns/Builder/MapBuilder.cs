@@ -1,48 +1,64 @@
-﻿using GameServer.Models;
+﻿using GameServer.Constants;
+using GameServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace GameServer.Patterns.Builder
 {
-    public static class MapBuilder
+    public class MapBuilder
     {
-        private static readonly IslandBuilder _islandBuilder = new IslandBuilder();
+        public Map MapObject { get; private set; }
 
-        private static readonly SnowBallBuilder _snowBallBuilder = new SnowBallBuilder();
+        private readonly IUnitAbstractFactory _mapUnitFactory;
 
-        private static readonly BlueUnitFactory _blueUnitFactory = new BlueUnitFactory();
 
-        public static Map Build()
+        public MapBuilder(GameLevels level)
         {
-            Map map = new Map();
-            map._islands = BuildIslands();
-            map._snowBalls = BuildSnowBalls();
-            map._blueFoods = BuildBlueFoods();
-            map._blueRocks = BuildBlueRocks();
-
-            return map;
+            _mapUnitFactory = new LevelFactory().CreateAbstractUnitFactory(level);
         }
 
-        public static List<Island> BuildIslands()
+        public MapBuilder CreateNew()
         {
-            return _islandBuilder.BuildMany(2);
+            MapObject = new Map();
+            return this;
         }
 
-        public static List<SnowBall> BuildSnowBalls()
+        public MapBuilder AddIslands(int quantity)
         {
-            return _snowBallBuilder.BuildMany(2);
+            MapObject._islands = IslandBuilder.BuildMany(quantity);
+            return this;
         }
 
-        public static List<BaseUnit> BuildBlueFoods()
+        public MapBuilder AddSnowBalls(int quantity)
         {
-            return _blueUnitFactory.BuildManyFoods(2);
+            MapObject._snowBalls = SnowBallBuilder.BuildMany(quantity);
+            return this;
         }
 
-        public static List<BaseUnit> BuildBlueRocks()
+        public MapBuilder AddFoods(int quantity)
         {
-            return _blueUnitFactory.BuildManyRocks(2);
+            MapObject._foods = new List<BaseFood>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._foods.Add(_mapUnitFactory.CreateFood());
+            return this;
         }
+
+        public MapBuilder AddRocks(int quantity)
+        {
+            MapObject._rocks = new List<BaseObstacle>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._rocks.Add(_mapUnitFactory.CreateRock());
+            return this;
+        }
+        public MapBuilder AddBoxes(int quantity)
+        {
+            MapObject._boxes = new List<Box>();
+            for (int i = 0; i < quantity; i++)
+                MapObject._boxes = BoxBuilder.BuildMany(quantity, MapObject._foods.Cast<BaseUnit>().ToList());
+            return this;
+        }
+
+
     }
 }

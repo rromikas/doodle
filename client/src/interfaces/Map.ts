@@ -1,5 +1,6 @@
-import BlueFood from "./BlueFood";
-import BlueRock from "./BlueRock";
+import BaseFood from "./BaseFood";
+import BaseObstacle from "./BaseObstacle";
+import Composite from "./Composite";
 import Island from "./Island";
 import Player from "./Player";
 import SnowBall from "./SnowBall";
@@ -8,8 +9,9 @@ interface IMap {
   _players: { [key: string]: Player };
   _snowBalls: SnowBall[];
   _islands: Island[];
-  _blueFoods: BlueFood[];
-  _blueRocks: BlueRock[];
+  _foods: BaseFood[];
+  _rocks: BaseObstacle[];
+  _boxes: Composite[];
 }
 
 export default IMap;

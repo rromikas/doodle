@@ -1,7 +1,7 @@
-import BaseUnit from "./BaseUnit";
+import Composite from "./Composite";
 
-interface Player extends BaseUnit {
-  username: string;
+interface Player extends Composite {
+  userName: string;
 }
 
 export default Player;

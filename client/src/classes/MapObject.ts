@@ -1,43 +1,27 @@
-import Coordinate from "../interfaces/Coordinate";
 import BaseUnit from "../interfaces/BaseUnit";
+import { colors } from "../constants/index.js";
+
+type MapObjectType = "food" | "rock" | "island" | "snowBall" | "box";
 
 class MapObject {
   unit: BaseUnit;
   node: HTMLElement;
+  type: MapObjectType;
 
-  constructor(u: BaseUnit, type: "food" | "rock" | "island" | "snowBall") {
+  constructor(u: BaseUnit, type: MapObjectType) {
+    this.type = type;
     this.unit = u;
     this.node = document.createElement("div");
-    this.node.className = "mapObject";
-    this.node.style.borderRadius = "50%";
+    this.node.classList.add("mapObject");
+    this.node.classList.add(type);
     this.node.style.left = `${u.coordinate.x}px`;
     this.node.style.bottom = `${u.coordinate.y}px`;
-    this.node.style.background = "blue";
+    this.node.style.background = colors[u.color];
+    this.node.style.width = u.size.sizeX + "px";
+    this.node.style.height = u.size.sizeY + "px";
     this.node.style.color = "white";
-    switch (type) {
-      case "food": {
-        this.node.innerHTML = "Food";
-        break;
-      }
-      case "rock": {
-        this.node.innerHTML = "Rock";
-        break;
-      }
-      case "island": {
-        this.node.innerHTML = "Island";
-        this.node.style.background = "brown";
-        break;
-      }
-      case "snowBall": {
-        this.node.innerHTML = "SnowBall";
-        this.node.style.background = "deepskyblue";
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-
+    this.node.innerHTML = type;
+    this.node.style.background = colors[u.color];
     document.getElementById("map")?.appendChild(this.node);
   }
 }

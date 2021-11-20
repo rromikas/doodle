@@ -5,6 +5,37 @@
   margin-bottom: 4px;
 }
 
+#logo {
+  font-weight: bold;
+  position: absolute;
+  left: 20;
+  top: 15;
+  font-size: 28px;
+  z-index: 20;
+}
+
+input {
+  font-family: poppins;
+  width: 100%;
+  margin-bottom: 20px;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  background: rgb(230, 231, 241);
+  padding: 10px 20px;
+}
+
+#login {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+}
+
 .root {
   font-family: poppins, sans-serif;
   margin: 0;
@@ -33,6 +64,12 @@
   margin-bottom: 4px;
   user-select: none;
   font-weight: bold;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.button:hover {
+  opacity: 0.8;
 }
 
 * {
@@ -49,6 +86,12 @@
     rgba(0, 255, 194, 0.58) 79.25%,
     rgba(0, 163, 255, 0.48) 100%
   );
+  transition: all 0.05s;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 10000px;
 }
 
 .player {
@@ -81,11 +124,102 @@
 }
 
 .mapObject {
-  width: 65px;
-  height: 65px;
   display: flex;
   position: absolute;
   justify-content: center;
   align-items: center;
   font-size: 12px;
+  text-transform: capitalize;
+}
+
+.island {
+  border-radius: 20px !important;
+}
+
+.food,
+.snowBall,
+.rock {
+  border-radius: 50%;
+}
+
+#game-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+#game-console {
+  flex-shrink: 0;
+  padding: 20px;
+  width: 250px;
+  z-index: 10;
+  position: relative;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+#map-holder {
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.value {
+  font-size: 26;
+  font-weight: 600;
+}
+
+#items-holder {
+  flex-grow: 1;
+  border-radius: 6px;
+  padding: 25px 10px 10px 10px;
+  background: #eeeeee;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+#items-holder::after {
+  content: "ITEMS";
+  position: absolute;
+  top: 3;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.pack {
+  border-radius: 6px;
+  padding-left: 5px;
+  padding-top: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.2);
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.item {
+  border-radius: 50%;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.box {
+  border: 2px solid white;
 }
