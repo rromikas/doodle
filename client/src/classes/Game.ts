@@ -311,6 +311,9 @@ export class Game {
 
   openBox(box: BaseUnit) {
     this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
+    box.items?.forEach((x) => {
+      this.changeSpeed(x.impact);
+    });
   }
 
   doObjectsOverlap(
