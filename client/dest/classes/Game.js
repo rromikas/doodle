@@ -272,7 +272,11 @@ export class Game {
     }
     bump(obstacle) { }
     openBox(box) {
+        var _a;
         this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
+        (_a = box.items) === null || _a === void 0 ? void 0 : _a.forEach((x) => {
+            this.changeSpeed(x.impact);
+        });
     }
     doObjectsOverlap(unit, coordinate) {
         const { x: ux, y: uy } = unit.coordinate;
