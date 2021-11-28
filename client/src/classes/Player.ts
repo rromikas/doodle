@@ -14,6 +14,7 @@ class Player implements IPlayer {
   isMain: boolean;
   impact: number;
   items: BaseUnit[] = [];
+  speed: number;
 
   constructor(u: IPlayer | null, isMain: boolean = false) {
     let unit = u || {
@@ -23,6 +24,7 @@ class Player implements IPlayer {
       coordinate: { x: 0, y: 0 },
       id: "",
       impact: 0,
+      speed: 10,
     };
     this.userName = unit.userName;
     this.size = unit.size;
@@ -31,6 +33,7 @@ class Player implements IPlayer {
     this.id = unit.id;
     this.isMain = isMain;
     this.impact = unit.impact;
+    this.speed = unit.speed;
 
     if (isMain) {
       this.node = document.getElementById("player") as HTMLElement;

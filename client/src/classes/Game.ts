@@ -178,7 +178,7 @@ export class Game {
   onAddUnit(unit: BaseUnit, username: string) {
     this.mapObjects.push(new MapObject(unit, "food"));
     if (username === this.mainPlayer.userName) {
-      this.changeSpeed(-unit.impact);
+      this.changeSpeed(this.mainPlayer.speed);
     }
   }
 
@@ -248,6 +248,7 @@ export class Game {
         id: Math.random().toString(),
         impact: 0,
         items: [],
+        speed: 10,
       },
       true
     );
@@ -304,7 +305,7 @@ export class Game {
 
   eat(foodObject: BaseFood) {
     this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-    this.changeSpeed(foodObject.impact);
+    this.changeSpeed(this.mainPlayer.speed);
   }
 
   bump(obstacle: BaseObstacle) {}
@@ -312,7 +313,7 @@ export class Game {
   openBox(box: BaseUnit) {
     this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
     box.items?.forEach((x) => {
-      this.changeSpeed(x.impact);
+      this.changeSpeed(this.mainPlayer.speed);
     });
   }
 
@@ -352,8 +353,8 @@ export class Game {
     this.movingInterval = undefined;
   }
 
-  changeSpeed(speedChange: number) {
-    this.speed = this.speed + speedChange;
+  changeSpeed(speed: number) {
+    this.speed = speed;
     this.speedNode.innerHTML = this.speed.toString();
   }
 
