@@ -1,8 +1,4 @@
-﻿using Patterns.State;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GameServer.Patterns.State;
 
 namespace GameServer.Models
 {
@@ -27,7 +23,7 @@ namespace GameServer.Models
                 SetNextState();
             }
 
-            Speed = State.UpdateSpeed(Speed);
+            SetSpeed(State.GetNewSpeed(Speed));
         }
 
         private void SetNextState()
@@ -37,6 +33,11 @@ namespace GameServer.Models
                 State = State.GetNextState();
             }
            
+        }
+
+        public void SetSpeed (int speed)
+        {
+            Speed = speed;
         }
     }
 

@@ -8,6 +8,7 @@
     <Folder Include="Constants\" />
     <Folder Include="Logs\" />
     <Folder Include="Patterns\Abstract Factory\" />
+    <Folder Include="Patterns\Chain\" />
     <Folder Include="Patterns\Strategy\" />
     <Folder Include="Patterns\Factory\" />
     <Folder Include="Patterns\Adapter\" />

@@ -4,7 +4,7 @@ using System;
 /**
 * @(#) PlayerState.cs
 */
-namespace Patterns.State
+namespace GameServer.Patterns.State
 {
 	public abstract class PlayerState
 	{
@@ -35,6 +35,6 @@ namespace Patterns.State
 			return false;
 		}
 
-		public abstract int UpdateSpeed(int speed);
+		public abstract int GetNewSpeed(int speed);
 	}
 }
