@@ -2,7 +2,7 @@
  * @(#) CasualState.cs
  */
 
-namespace Patterns.State
+namespace GameServer.Patterns.State
 {
 	public class CasualState : PlayerState
 	{
@@ -11,7 +11,7 @@ namespace Patterns.State
 			
         }
 
-		public override int UpdateSpeed(int speed)
+		public override int GetNewSpeed(int speed)
 		{
 			return speed;
 		}

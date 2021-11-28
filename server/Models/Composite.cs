@@ -18,6 +18,11 @@ namespace GameServer.Models
             Items.Add(item);
         }
 
+        public List<BaseUnit> GetItems()
+        {
+            return Items;
+        }
+
         public void RemoveItem(string itemId)
         {
             var item = Items.Find(x => x.Id.CompareTo(itemId) == 0);

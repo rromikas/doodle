@@ -2,7 +2,7 @@
  * @(#) SlowedDownState.cs
  */
 
-namespace Patterns.State
+namespace GameServer.Patterns.State
 {
 	public class SlowedDownState : PlayerState
 	{
@@ -11,7 +11,7 @@ namespace Patterns.State
 
 		}
 
-		public override int UpdateSpeed(int speed)
+		public override int GetNewSpeed(int speed)
 		{
 			if (speed < 10) return speed;
 
