@@ -1,6 +1,7 @@
 ﻿using GameServer.Constants;
 using GameServer.Models;
 using GameServer.Models.Singleton;
+using GameServer.Patterns.State;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,13 @@ namespace GameServer.Patterns.Command
 
         private BaseFood food = null;
 
+        private PlayerStateSpeedResolver playerStateSpeedResolver;
+
         public EatFoodCommand(string playerId, string foodId, Map map, IHubCallerClients clients) : base(map, clients)
         {
             _playerId = playerId;
             _foodId = foodId;
+            playerStateSpeedResolver = new PlayerStateSpeedResolver();
         }
 
         public override async Task Execute()
@@ -28,6 +32,8 @@ namespace GameServer.Patterns.Command
             food = _map.RemoveFood(_foodId);
             _map._players[_playerId].AddItem(food);
             food.Id = _foodId;
+
+            playerStateSpeedResolver.Resolve(_map);
             await _clients.All.SendAsync(HubMethods.ALL_INFO, _map);
             FileLogger.logger.Log(String.Format("Food with id '{0}' was eaten! ", _foodId));
         }
