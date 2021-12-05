@@ -10,4 +10,7 @@ export const GameLevels = {
     0: "Easy",
     1: "Medium",
     2: "Hard",
+    3: "Random easy",
+    4: "Random medium",
+    5: "Random hard",
 };

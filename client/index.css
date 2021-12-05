@@ -223,3 +223,12 @@ input {
 .box {
   border: 2px solid white;
 }
+
+.label {
+  margin-right: 10px;
+}
+
+.value {
+  line-height: 1;
+  text-align: right;
+}

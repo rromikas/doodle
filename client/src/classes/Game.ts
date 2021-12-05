@@ -109,7 +109,7 @@ export class Game {
 
   async onUserConnected(gameLevel: keyof typeof GameLevels | null) {
     if (gameLevel == null) {
-      const res = await window.prompt("Select game level (0,1,2)");
+      const res = await window.prompt("Select game level (0-5)");
       if (res) {
         this.connection.invoke("setLevel", +res);
       }
@@ -178,7 +178,7 @@ export class Game {
   onAddUnit(unit: BaseUnit, username: string) {
     this.mapObjects.push(new MapObject(unit, "food"));
     if (username === this.mainPlayer.userName) {
-      this.changeSpeed(this.mainPlayer.speed);
+      this.changeSpeed(-unit.impact);
     }
   }
 
@@ -305,7 +305,7 @@ export class Game {
 
   eat(foodObject: BaseFood) {
     this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-    this.changeSpeed(this.mainPlayer.speed);
+    this.changeSpeed(foodObject.impact);
   }
 
   bump(obstacle: BaseObstacle) {}
@@ -313,7 +313,7 @@ export class Game {
   openBox(box: BaseUnit) {
     this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
     box.items?.forEach((x) => {
-      this.changeSpeed(this.mainPlayer.speed);
+      this.changeSpeed(x.impact);
     });
   }
 
@@ -353,8 +353,8 @@ export class Game {
     this.movingInterval = undefined;
   }
 
-  changeSpeed(speed: number) {
-    this.speed = speed;
+  changeSpeed(speedChange: number) {
+    this.speed += speedChange;
     this.speedNode.innerHTML = this.speed.toString();
   }
 

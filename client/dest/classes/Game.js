@@ -91,7 +91,7 @@ export class Game {
     onUserConnected(gameLevel) {
         return __awaiter(this, void 0, void 0, function* () {
             if (gameLevel == null) {
-                const res = yield window.prompt("Select game level (0,1,2)");
+                const res = yield window.prompt("Select game level (0-5)");
                 if (res) {
                     this.connection.invoke("setLevel", +res);
                 }
@@ -221,6 +221,7 @@ export class Game {
             id: Math.random().toString(),
             impact: 0,
             items: [],
+            speed: 10,
         }, true);
         this.connection
             .invoke("login", this.mainPlayer.userName, this.mainPlayer.coordinate)
@@ -307,7 +308,9 @@ export class Game {
         this.movingInterval = undefined;
     }
     changeSpeed(speedChange) {
-        this.speed = this.speed + speedChange;
+        alert(this.speed + " " + speedChange);
+        this.speed += speedChange;
+        alert(this.speed);
         this.speedNode.innerHTML = this.speed.toString();
     }
     getMapOffsetY() {

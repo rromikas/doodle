@@ -9,6 +9,7 @@ class Player {
             coordinate: { x: 0, y: 0 },
             id: "",
             impact: 0,
+            speed: 10,
         };
         this.userName = unit.userName;
         this.size = unit.size;
@@ -17,6 +18,7 @@ class Player {
         this.id = unit.id;
         this.isMain = isMain;
         this.impact = unit.impact;
+        this.speed = unit.speed;
         if (isMain) {
             this.node = document.getElementById("player");
         }
