@@ -308,9 +308,7 @@ export class Game {
         this.movingInterval = undefined;
     }
     changeSpeed(speedChange) {
-        alert(this.speed + " " + speedChange);
         this.speed += speedChange;
-        alert(this.speed);
         this.speedNode.innerHTML = this.speed.toString();
     }
     getMapOffsetY() {
