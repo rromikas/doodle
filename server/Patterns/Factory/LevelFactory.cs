@@ -24,11 +24,11 @@ namespace GameServer.Patterns
             {
                 foreach (IUnitAbstractFactory f in gameLevels)
                 {
-                    if (f is GreenUnitFactory && GameLevels.Easy == selectedLevel)
+                    if (f is GreenUnitFactory && GameLevels.Easy == selectedLevel || GameLevels.RandomEasy == selectedLevel)
                         return f;
-                    else if (f is BlueUnitFactory && GameLevels.Medium == selectedLevel)
+                    else if (f is BlueUnitFactory && GameLevels.Medium == selectedLevel || GameLevels.RandomMedium == selectedLevel)
                         return f;
-                    else if (f is RedUnitFactory && GameLevels.Hard == selectedLevel)
+                    else if (f is RedUnitFactory && GameLevels.Hard == selectedLevel || GameLevels.RandomHard == selectedLevel)
                         return f;
                 }
                 return LevelCreator(selectedLevel);
