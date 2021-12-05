@@ -1,13 +1,18 @@
 ﻿using System;
 using GameServer.Constants;
+using GameServer.Patterns.Visitor;
 
 namespace GameServer.Models
 {
-    public class RedFood : BaseFood
+    public class RedFood : BaseFood, IChangePoints
     {
-        const int REWARD_POINTS = 2;
+        static int REWARD_POINTS = LevelValues.DefaultRedReward;
         public RedFood(Coordinate coordinate) : base(coordinate, REWARD_POINTS, ColorTypes.Red)
         {
+        }
+        public void ChangePoints(IVisitor v)
+        {
+            v.ChangeReward(this);
         }
     }
 }

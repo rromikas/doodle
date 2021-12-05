@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameServer.Constants;
 using GameServer.Models;
+using GameServer.Patterns.Visitor;
 
 namespace GameServer.Patterns
 {
@@ -38,14 +39,17 @@ namespace GameServer.Patterns
             switch (selectedLevel)
             {
                 case GameLevels.Easy:
+                case GameLevels.RandomEasy:
                     GreenUnitFactory Greenfactory = new GreenUnitFactory();
                     gameLevels.Add(Greenfactory);
                     return Greenfactory;
                 case GameLevels.Medium:
+                case GameLevels.RandomMedium:
                     BlueUnitFactory Bluefactory = new BlueUnitFactory();
                     gameLevels.Add(Bluefactory);
                     return Bluefactory;
                 case GameLevels.Hard:
+                case GameLevels.RandomHard:
                     RedUnitFactory Redfactory = new RedUnitFactory();
                     gameLevels.Add(Redfactory);
                     return Redfactory;

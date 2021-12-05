@@ -31,7 +31,22 @@ namespace GameServer.Hubs
             if (_map == null)
             {
                 level = lvl;
-                MapBuilder mapBuilder = new MapBuilder(lvl);
+                MapBuilder mapBuilder;
+                switch (level)
+                {
+                    case GameLevels.RandomEasy:
+                        mapBuilder = new MapBuilder(lvl,0,2,0,2);
+                        break;
+                    case GameLevels.RandomMedium:
+                        mapBuilder = new MapBuilder(lvl, -2, 5, -5, 2);
+                        break;
+                    case GameLevels.RandomHard:
+                        mapBuilder = new MapBuilder(lvl, -5, 10, -10, 5);
+                        break;
+                    default:
+                        mapBuilder = new MapBuilder(lvl);
+                        break;
+                }
                 _map = mapBuilder.CreateNew().AddFoods(10).AddIslands(10).AddRocks(10).AddSnowBalls(10).AddBoxes(10).MapObject;
                 Clients.All.SendAsync(HubMethods.SET_LEVEL, lvl);
             }
