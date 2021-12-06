@@ -79,11 +79,9 @@ export class Game {
     }
     updateLevelButtons(gameLevel) {
         let lvlButtons = this.levelNode.children;
-        console.log("GAME LEVEL, level buttons", gameLevel, lvlButtons.length);
         for (let i = 0; i < lvlButtons.length; i++) {
             lvlButtons[i].classList.remove("active");
             if (i === gameLevel - 1) {
-                console.log("buvo");
                 lvlButtons[i].classList.add("active");
             }
         }
