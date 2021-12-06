@@ -1,16 +1,7 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { getRandomInt } from "../helper.js";
 import Player from "./Player.js";
 import MapObject from "./MapObject.js";
-import { colors, GameLevels } from "../constants/index.js";
+import { colors } from "../constants/index.js";
 export class Game {
     constructor(conn) {
         this.pressedKeys = {
@@ -33,7 +24,6 @@ export class Game {
         this.paused = false;
         this.freezed = false;
         this.connection = conn;
-        this.addCommandListeners();
         this.mapNode = document.getElementById("map");
         this.screenHeight = window.innerHeight;
         this.mapHeight = parseInt(this.mapNode.style.height);
@@ -41,11 +31,12 @@ export class Game {
         this.scoreNode.innerHTML = "100";
         this.speedNode = document.getElementById("speed");
         this.speedNode.innerHTML = this.speed.toString();
-        this.levelNode = document.getElementById("level");
+        this.levelNode = document.getElementById("levels-container");
         this.pauseBtn = document.getElementById("pause-btn");
         this.undoBtn = document.getElementById("undo-btn");
         this.itemsNode = document.getElementById("items-holder");
         this.addJoinListeners();
+        this.addCommandListeners();
         this.mainPlayer = new Player(null, true);
         window.setInterval(() => this.connection.invoke("updateMap"), 500);
         this.connection.on("AllInfo", this.onAllInfo.bind(this));
@@ -57,8 +48,6 @@ export class Game {
         this.connection.on("Pause", this.onPause.bind(this));
         this.connection.on("Resume", this.onResume.bind(this));
         this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
-        this.connection.on("UserConnected", this.onUserConnected.bind(this));
-        this.connection.on("SetLevel", this.onSetLevel.bind(this));
     }
     onAllInfo(map) {
         console.log("ALL INFO", map);
@@ -88,24 +77,19 @@ export class Game {
             }
         });
     }
-    onUserConnected(gameLevel) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (gameLevel == null) {
-                const res = yield window.prompt("Select game level (0-5)");
-                if (res) {
-                    this.connection.invoke("setLevel", +res);
-                }
+    updateLevelButtons(gameLevel) {
+        let lvlButtons = this.levelNode.children;
+        console.log("GAME LEVEL, level buttons", gameLevel, lvlButtons.length);
+        for (let i = 0; i < lvlButtons.length; i++) {
+            lvlButtons[i].classList.remove("active");
+            if (i === gameLevel - 1) {
+                console.log("buvo");
+                lvlButtons[i].classList.add("active");
             }
-            else {
-                this.onSetLevel(gameLevel);
-            }
-        });
-    }
-    onSetLevel(gameLevel) {
-        this.lavel = gameLevel;
-        this.levelNode.innerHTML = GameLevels[gameLevel];
+        }
     }
     rerenderMapObjects(map) {
+        this.updateLevelButtons(map.gameLevel);
         this.mapObjects.forEach((x) => this.onRemoveUnit(x.unit.id));
         map._foods.forEach((x) => {
             this.mapObjects.push(new MapObject(x, "food"));
@@ -229,6 +213,12 @@ export class Game {
     }
     addCommandListeners() {
         var _a, _b;
+        let lvlButtons = this.levelNode.children;
+        for (let i = 0; i < lvlButtons.length; i++) {
+            lvlButtons[i].addEventListener("click", (e) => {
+                this.connection.invoke("setLevel", this.mainPlayer.userName, i + 1);
+            });
+        }
         window.addEventListener("keydown", (e) => {
             if (Object.keys(this.pressedKeys).includes(e.key)) {
                 this.pressedKeys[e.key] = true;

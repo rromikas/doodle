@@ -4,17 +4,20 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GameServer.Patterns.Strategy;
+using System.Text.Json;
+using GameServer.Memento;
+using GameServer.Constants;
 
 namespace GameServer.Models
 {
     public class Map
     {
+        public GameLevels GameLevel { get; set; }
         public Dictionary<string, Player> _players { get; set; } = new Dictionary<string, Player>();
         public List<SnowBall> _snowBalls { get; set; }
         public List<Island> _islands { get; set; }
         public List<BaseFood> _foods { get; set; }
         public List<BaseObstacle> _rocks { get; set; }
-
 
         public List<Box> _boxes { get; set; }
 
@@ -86,6 +89,11 @@ namespace GameServer.Models
         public void AddFood(BaseFood food)
         {
             _foods.Add(food);
+        }
+
+        public MapSnapshot createSnapshot()
+        {
+            return new MapSnapshot(this, new List<SnowBall>(_snowBalls), new List<Island>(_islands), new List<BaseFood>(_foods), new List<BaseObstacle>(_rocks), new List<Box>(_boxes), GameLevel);
         }
     }
 }

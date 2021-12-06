@@ -23,6 +23,7 @@ namespace GameServer.Patterns.Builder
         {
             _mapUnitFactory = new LevelFactory().CreateAbstractUnitFactory(level);
             GameLevel = level;
+
             if (GameLevels.RandomEasy == level || GameLevels.RandomMedium == level || GameLevels.RandomHard == level)
             {
                 DamageFrom = mDamageFrom;
@@ -35,6 +36,14 @@ namespace GameServer.Patterns.Builder
         public MapBuilder CreateNew()
         {
             MapObject = new Map();
+            MapObject.GameLevel = GameLevel;
+            return this;
+        }
+
+        public MapBuilder UpdateExisting(Map mapWithPlayers)
+        {
+            MapObject = mapWithPlayers;
+            MapObject.GameLevel = GameLevel;
             return this;
         }
 

@@ -48,7 +48,6 @@ export class Game {
 
   constructor(conn: HubConnection) {
     this.connection = conn;
-    this.addCommandListeners();
     this.mapNode = document.getElementById("map") as HTMLElement;
     this.screenHeight = window.innerHeight;
     this.mapHeight = parseInt(this.mapNode.style.height);
@@ -56,11 +55,12 @@ export class Game {
     this.scoreNode.innerHTML = "100";
     this.speedNode = document.getElementById("speed") as HTMLElement;
     this.speedNode.innerHTML = this.speed.toString();
-    this.levelNode = document.getElementById("level") as HTMLElement;
+    this.levelNode = document.getElementById("levels-container") as HTMLElement;
     this.pauseBtn = document.getElementById("pause-btn") as HTMLElement;
     this.undoBtn = document.getElementById("undo-btn") as HTMLElement;
     this.itemsNode = document.getElementById("items-holder") as HTMLElement;
     this.addJoinListeners();
+    this.addCommandListeners();
     this.mainPlayer = new Player(null, true);
     window.setInterval(() => this.connection.invoke("updateMap"), 500);
 
@@ -73,8 +73,6 @@ export class Game {
     this.connection.on("Pause", this.onPause.bind(this));
     this.connection.on("Resume", this.onResume.bind(this));
     this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
-    this.connection.on("UserConnected", this.onUserConnected.bind(this));
-    this.connection.on("SetLevel", this.onSetLevel.bind(this));
   }
 
   onAllInfo(map: IMap) {
@@ -107,23 +105,18 @@ export class Game {
     });
   }
 
-  async onUserConnected(gameLevel: keyof typeof GameLevels | null) {
-    if (gameLevel == null) {
-      const res = await window.prompt("Select game level (0-5)");
-      if (res) {
-        this.connection.invoke("setLevel", +res);
+  updateLevelButtons(gameLevel: keyof typeof GameLevels) {
+    let lvlButtons = this.levelNode.children;
+    for (let i = 0; i < lvlButtons.length; i++) {
+      lvlButtons[i].classList.remove("active");
+      if (i === gameLevel - 1) {
+        lvlButtons[i].classList.add("active");
       }
-    } else {
-      this.onSetLevel(gameLevel);
     }
   }
 
-  onSetLevel(gameLevel: keyof typeof GameLevels) {
-    this.lavel = gameLevel;
-    this.levelNode.innerHTML = GameLevels[gameLevel];
-  }
-
   rerenderMapObjects(map: IMap) {
+    this.updateLevelButtons(map.gameLevel);
     this.mapObjects.forEach((x) => this.onRemoveUnit(x.unit.id));
     map._foods.forEach((x) => {
       this.mapObjects.push(new MapObject(x, "food"));
@@ -259,6 +252,13 @@ export class Game {
   }
 
   addCommandListeners() {
+    let lvlButtons = this.levelNode.children;
+    for (let i = 0; i < lvlButtons.length; i++) {
+      lvlButtons[i].addEventListener("click", (e) => {
+        this.connection.invoke("setLevel", this.mainPlayer.userName, i + 1);
+      });
+    }
+
     window.addEventListener("keydown", (e) => {
       if (Object.keys(this.pressedKeys).includes(e.key)) {
         this.pressedKeys[e.key as MoveKey] = true;
