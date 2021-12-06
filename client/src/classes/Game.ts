@@ -175,11 +175,8 @@ export class Game {
     found.node.parentNode?.removeChild(found.node);
   }
 
-  onAddUnit(unit: BaseUnit, username: string) {
+  onAddUnit(unit: BaseUnit) {
     this.mapObjects.push(new MapObject(unit, "food"));
-    if (username === this.mainPlayer.userName) {
-      this.changeSpeed(-unit.impact);
-    }
   }
 
   onPlayerMoveInfo(username: string, coordinate: Coordinate, undo: boolean) {
@@ -213,6 +210,7 @@ export class Game {
         this.players.push(new Player(player));
       } else {
         this.mainPlayer.items = player.items;
+        this.changeSpeed(player.speed);
         this.startRenderingItems();
       }
     });
@@ -305,16 +303,12 @@ export class Game {
 
   eat(foodObject: BaseFood) {
     this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-    this.changeSpeed(foodObject.impact);
   }
 
   bump(obstacle: BaseObstacle) {}
 
   openBox(box: BaseUnit) {
     this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
-    box.items?.forEach((x) => {
-      this.changeSpeed(x.impact);
-    });
   }
 
   doObjectsOverlap(
@@ -353,8 +347,8 @@ export class Game {
     this.movingInterval = undefined;
   }
 
-  changeSpeed(speedChange: number) {
-    this.speed += speedChange;
+  changeSpeed(newSpeed: number) {
+    this.speed = newSpeed;
     this.speedNode.innerHTML = this.speed.toString();
   }
 

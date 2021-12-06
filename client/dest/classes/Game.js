@@ -155,11 +155,8 @@ export class Game {
         this.mapObjects.splice(foundIndex, 1);
         (_a = found.node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(found.node);
     }
-    onAddUnit(unit, username) {
+    onAddUnit(unit) {
         this.mapObjects.push(new MapObject(unit, "food"));
-        if (username === this.mainPlayer.userName) {
-            this.changeSpeed(-unit.impact);
-        }
     }
     onPlayerMoveInfo(username, coordinate, undo) {
         if (username in this.players) {
@@ -189,6 +186,7 @@ export class Game {
             }
             else {
                 this.mainPlayer.items = player.items;
+                this.changeSpeed(player.speed);
                 this.startRenderingItems();
             }
         });
@@ -269,15 +267,10 @@ export class Game {
     }
     eat(foodObject) {
         this.connection.invoke("eat", this.mainPlayer.userName, foodObject.id);
-        this.changeSpeed(foodObject.impact);
     }
     bump(obstacle) { }
     openBox(box) {
-        var _a;
         this.connection.invoke("openBox", this.mainPlayer.userName, box.id);
-        (_a = box.items) === null || _a === void 0 ? void 0 : _a.forEach((x) => {
-            this.changeSpeed(x.impact);
-        });
     }
     doObjectsOverlap(unit, coordinate) {
         const { x: ux, y: uy } = unit.coordinate;
@@ -307,8 +300,8 @@ export class Game {
         clearInterval(this.movingInterval);
         this.movingInterval = undefined;
     }
-    changeSpeed(speedChange) {
-        this.speed += speedChange;
+    changeSpeed(newSpeed) {
+        this.speed = newSpeed;
         this.speedNode.innerHTML = this.speed.toString();
     }
     getMapOffsetY() {
