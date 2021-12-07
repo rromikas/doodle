@@ -13,7 +13,7 @@ namespace GameServer.Patterns.State
         public PlayerState GenerateBox(PlayerState previousState)
         {
             var random = new Random();
-            var list = new List<PlayerState> {new BoostedState(previousState), new SlowedDownState(previousState), };
+            var list = new List<PlayerState> {new BoostedState(previousState), new SlowedDownState(previousState), new PausedState(previousState), };
 
             return list[random.Next(list.Count)];
         }
