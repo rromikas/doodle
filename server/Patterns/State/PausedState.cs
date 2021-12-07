@@ -13,8 +13,7 @@ namespace GameServer.Patterns.State
 
 		public override int GetNewSpeed(int speed)
 		{
-			if (speed > 100) return speed;
-			return speed + 2;
+			return 0;
 		}
 	}
 	
