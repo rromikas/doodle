@@ -16,7 +16,7 @@ namespace GameServer.Patterns.Chain
 				pair.Value.UpdateSpeedByState();
 			}
 
+			_nextResolver.Resolve(map);
 		}
 	}
-	
 }

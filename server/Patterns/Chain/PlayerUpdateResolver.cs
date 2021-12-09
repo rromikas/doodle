@@ -8,12 +8,15 @@ namespace GameServer.Patterns.Chain
 
         PlayerSpeedFromStateResolver playerSpeedFromStateResolver;
 
+        PlayerSpeedFromObstaclesResolver playerSpeedFromObstaclesResolver;
+
         public PlayerUpdateResolver()
         {
             playerSpeedResolver = new PlayerSpeedResolver();
             playerSpeedFromStateResolver = new PlayerSpeedFromStateResolver();
+            playerSpeedFromObstaclesResolver = new PlayerSpeedFromObstaclesResolver();
 
-            playerSpeedResolver.SetNext(playerSpeedFromStateResolver);
+            playerSpeedResolver.SetNext(playerSpeedFromStateResolver).SetNext(playerSpeedFromObstaclesResolver);
         }
 
         public void Resolve(Map map)
