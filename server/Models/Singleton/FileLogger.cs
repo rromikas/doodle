@@ -14,7 +14,7 @@ namespace GameServer.Models.Singleton
         readonly object lockObj = new object();
         string filePath = Path.GetFullPath(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, @"./server/Logs/log.log"));
 
-        readonly IOutputOperations output = new FileOutputAdapter();
+        readonly IOutputOperations output = new ConsoleOutputAdapter();
 
         public void Log(string message)
         {
