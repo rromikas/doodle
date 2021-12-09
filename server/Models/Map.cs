@@ -7,6 +7,7 @@ using GameServer.Patterns.Strategy;
 using System.Text.Json;
 using GameServer.Memento;
 using GameServer.Constants;
+using GameServer.Patterns.Iterator;
 
 namespace GameServer.Models
 {
@@ -35,10 +36,16 @@ namespace GameServer.Models
             MoveAllObstacles();
         }
 
-        public void MoveAllObstacles()
+        private void MoveAllObstacles()
         {
-            foreach (BaseObstacle obstacle in _rocks)
-                obstacle.TryToMove();
+            var obstacles = new CustomList<BaseObstacle>(_rocks);
+            var iterator = obstacles.CreateIterator();
+            while (iterator.HasNext())
+            {
+                iterator.Next().TryToMove();
+            }
+            // foreach (BaseObstacle obstacle in _rocks)
+            //     obstacle.TryToMove();
         }
 
         public void UpdatePlayerById(string playerId, Coordinate coordinate)
