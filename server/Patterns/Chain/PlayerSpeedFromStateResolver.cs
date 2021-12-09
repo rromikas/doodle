@@ -19,5 +19,4 @@ namespace GameServer.Patterns.Chain
 			_nextResolver.Resolve(map);
 		}
 	}
-	
 }
