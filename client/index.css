@@ -208,11 +208,11 @@
   overflow: auto;
   flex-wrap: wrap;
   align-content: flex-start;
-  margin-bottom: 3px;
+  margin-bottom: 6px;
 }
 
 #chat {
-  margin-top: 3px;
+  margin-top: 6px;
   display: flex;
   align-items: flex-end;
   flex-direction: column;
