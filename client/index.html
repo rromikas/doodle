@@ -21,7 +21,12 @@
           style="background: white; border-radius: 13px; padding: 30px; margin: auto; width: 300px"
         >
           <h2 style="margin-top: 0; text-align: center">Join the game</h2>
-          <input required placeholder="Enter your username" id="username-input" class="login-input" />
+          <input
+            required
+            placeholder="Enter your username"
+            id="username-input"
+            class="login-input"
+          />
           <div id="join-btn" class="button" style="text-align: center">Join</div>
         </div>
       </div>
@@ -53,12 +58,14 @@
               <div class="">5</div>
             </div>
           </div>
-          <div id="items-holder" class="console-content"></div>
-          <div id="chat" class="console-content">
-            <div id="chat-content"></div>
-            <div id="chat-bottom">
-              <div style="flex-grow: 1;"><input id="chat-input"></input></div>
-              <div id="chat-button">Send</div>
+          <div style="flex-grow: 1; height: 0">
+            <div id="items-holder" class="console-content"></div>
+            <div id="chat" class="console-content">
+              <div id="chat-content"></div>
+              <div id="chat-bottom">
+                <div style="flex-grow: 1"><input id="chat-input" /></div>
+                <div id="chat-button">Send</div>
+              </div>
             </div>
           </div>
         </div>

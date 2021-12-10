@@ -196,7 +196,7 @@
 }
 
 .console-content {
-  flex-grow: 1;
+  height: 50%;
   border-radius: 6px;
   padding: 25px 10px 10px 10px;
   background: #eeeeee;
