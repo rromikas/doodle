@@ -1,16 +1,24 @@
+import { Message } from "./Message.js";
+import { Input } from "./Input.js";
+import { Button } from "./Button.js";
 export class Chat {
-    constructor(conn) {
-        this.node = document.getElementById("messages");
+    constructor(conn, game) {
+        this.messages = [];
         this.connection = conn;
-        const pingButton = document.getElementById("ping-button");
-        pingButton.addEventListener("click", () => {
-            this.connection.invoke("SendMessage", "username", `Someone pinged at ${new Date().toISOString().split("T")[1]}`);
-        });
+        this.game = game;
+        this.node = document.getElementById("chat-content");
+        this.input = new Input(this, "chat-input");
+        this.button = new Button(this, "chat-button");
     }
-    addMessage(message) {
-        const newMessage = document.createElement("div");
-        newMessage.className = "message";
-        newMessage.innerHTML = message;
-        this.node.appendChild(newMessage);
+    notify() {
+        this.connection.invoke("sendMessage", this.game.mainPlayer.userName, this.input.node.value);
+        this.input.node.value = "";
+    }
+    addMessage(user, text) {
+        this.messages.push(new Message(user, text));
+        this.node.scrollTop = 1000000;
+    }
+    clear() {
+        this.node.innerHTML = "";
     }
 }

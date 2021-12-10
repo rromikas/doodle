@@ -9,6 +9,7 @@ import Coordinate from "../interfaces/Coordinate";
 import BaseUnit from "../interfaces/BaseUnit";
 import { colors, GameLevels } from "../constants/index.js";
 import Composite from "../interfaces/Composite";
+import { Chat } from "./Chat.js";
 
 type MoveKey = "ArrowDown" | "ArrowUp" | "ArrowLeft" | "ArrowRight";
 
@@ -45,6 +46,7 @@ export class Game {
   paused: boolean = false;
   lavel: keyof typeof GameLevels | undefined;
   freezed: boolean = false;
+  chat: Chat;
 
   constructor(conn: HubConnection) {
     this.connection = conn;
@@ -62,8 +64,8 @@ export class Game {
     this.addJoinListeners();
     this.addCommandListeners();
     this.mainPlayer = new Player(null, true);
+    this.chat = new Chat(conn, this);
     window.setInterval(() => this.connection.invoke("updateMap"), 500);
-
     this.connection.on("AllInfo", this.onAllInfo.bind(this));
     this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
     this.connection.on("PlayerMoveInfo", this.onPlayerMoveInfo.bind(this));
@@ -76,9 +78,9 @@ export class Game {
   }
 
   onAllInfo(map: IMap) {
-    console.log("ALL INFO", map);
-    this.rerenderMapObjects(map);
     this.rerenderPlayers(map);
+    this.rerenderMapObjects(map);
+    this.rerenderChat(map);
   }
 
   startRenderingItems() {
@@ -113,6 +115,13 @@ export class Game {
         lvlButtons[i].classList.add("active");
       }
     }
+  }
+
+  rerenderChat(map: IMap) {
+    this.chat.clear();
+    map._messages.forEach((x) => {
+      this.chat.addMessage(x.user, x.text);
+    });
   }
 
   rerenderMapObjects(map: IMap) {

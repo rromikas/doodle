@@ -31,6 +31,11 @@ namespace GameServer.Hubs
             FileLogger.logger.Log(JsonSerializer.Serialize(_map));
         }
 
+        public async void SendMessage(string playerId, string text)
+        {
+            await _gameController.Run(new AddMessageCommand(playerId, text, _map, Clients), playerId);
+        }
+
         public async void SetLevel(string playerId, GameLevels lvl)
         {
              await _gameController.Run(new SetLevelCommand(lvl, _map, Clients), playerId);

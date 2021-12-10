@@ -2,6 +2,7 @@ import { getRandomInt } from "../helper.js";
 import Player from "./Player.js";
 import MapObject from "./MapObject.js";
 import { colors } from "../constants/index.js";
+import { Chat } from "./Chat.js";
 export class Game {
     constructor(conn) {
         this.pressedKeys = {
@@ -38,6 +39,7 @@ export class Game {
         this.addJoinListeners();
         this.addCommandListeners();
         this.mainPlayer = new Player(null, true);
+        this.chat = new Chat(conn, this);
         window.setInterval(() => this.connection.invoke("updateMap"), 500);
         this.connection.on("AllInfo", this.onAllInfo.bind(this));
         this.connection.on("PlayersInfo", this.onPlayersInfo.bind(this));
@@ -50,9 +52,9 @@ export class Game {
         this.connection.on("MoveObstacles", this.onMoveObstacles.bind(this));
     }
     onAllInfo(map) {
-        console.log("ALL INFO", map);
-        this.rerenderMapObjects(map);
         this.rerenderPlayers(map);
+        this.rerenderMapObjects(map);
+        this.rerenderChat(map);
     }
     startRenderingItems() {
         this.itemsNode.innerHTML = "";
@@ -85,6 +87,12 @@ export class Game {
                 lvlButtons[i].classList.add("active");
             }
         }
+    }
+    rerenderChat(map) {
+        this.chat.clear();
+        map._messages.forEach((x) => {
+            this.chat.addMessage(x.user, x.text);
+        });
     }
     rerenderMapObjects(map) {
         this.updateLevelButtons(map.gameLevel);

@@ -21,16 +21,19 @@
           style="background: white; border-radius: 13px; padding: 30px; margin: auto; width: 300px"
         >
           <h2 style="margin-top: 0; text-align: center">Join the game</h2>
-          <input required placeholder="Enter your username" id="username-input" />
+          <input required placeholder="Enter your username" id="username-input" class="login-input" />
           <div id="join-btn" class="button" style="text-align: center">Join</div>
         </div>
       </div>
       <div id="game-container">
         <div id="map-holder"><div style="transform: translateY(0px)" id="map"></div></div>
         <div id="game-console">
-          <div class="button" id="undo-btn" style="margin-bottom: 7px">Undo</div>
-          <div class="button" id="pause-btn">Pause</div>
-          <div style="padding: 30px 0">
+          <div style="display: flex; margin: 0 -3px">
+            <div class="button-small" id="undo-btn" style="width: 50%; margin: 0 3px">Undo</div>
+            <div class="button-small" id="pause-btn" style="width: 50%; margin: 0 3px">Pause</div>
+          </div>
+
+          <div style="padding: 15px 0">
             <div class="info-row">
               <div class="label">Height</div>
               <div class="value" id="score"></div>
@@ -50,7 +53,14 @@
               <div class="">5</div>
             </div>
           </div>
-          <div id="items-holder"></div>
+          <div id="items-holder" class="console-content"></div>
+          <div id="chat" class="console-content">
+            <div id="chat-content"></div>
+            <div id="chat-bottom">
+              <div style="flex-grow: 1;"><input id="chat-input"></input></div>
+              <div id="chat-button">Send</div>
+            </div>
+          </div>
         </div>
       </div>
 

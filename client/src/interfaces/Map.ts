@@ -5,6 +5,7 @@ import Composite from "./Composite";
 import Island from "./Island";
 import Player from "./Player";
 import SnowBall from "./SnowBall";
+import { Message } from "./Message";
 
 interface IMap {
   gameLevel: keyof typeof GameLevels;
@@ -14,6 +15,7 @@ interface IMap {
   _foods: BaseFood[];
   _rocks: BaseObstacle[];
   _boxes: Composite[];
+  _messages: Message[];
 }
 
 export default IMap;

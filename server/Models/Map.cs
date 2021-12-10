@@ -22,6 +22,8 @@ namespace GameServer.Models
 
         public List<Box> _boxes { get; set; }
 
+        public List<Message> _messages { get; set; } = new List<Message>();
+
         private Timer _gameClock;
 
 
@@ -62,6 +64,23 @@ namespace GameServer.Models
         public void RemovePlayer(string playerId)
         {
             _players.Remove(playerId);
+        }
+
+        public Message RemoveMessage(string messageId)
+        {
+            var m = _messages.Find(x => x.id.CompareTo(messageId) == 0);
+            if (m != null)
+            {
+                _messages.Remove(m);
+                return m;
+            }
+
+            return new Message();
+        }
+
+        public void AddMessage(Message m)
+        {
+            _messages.Add(m);
         }
 
         public BaseFood RemoveFood(string foodId)
