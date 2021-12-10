@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GameServer.Models;
 
 namespace GameServer.Patterns.Command
 {
-    public class GameController
+    public class GameController: IGameController
     {
         public Dictionary<string, List<AbstractCommand>> commands = new Dictionary<string, List<AbstractCommand>>();
 

@@ -17,7 +17,7 @@ namespace GameServer.Hubs
     {
         private static Map _map = null;
         private static Boolean paused = false;
-        private static GameController _gameController = new GameController();
+        private static IGameController _gameController = new GameControllerProxy();
         private static Nullable<GameLevels> level = null;
 
         public GameHub() 
