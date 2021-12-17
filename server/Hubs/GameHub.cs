@@ -9,6 +9,7 @@ using System.Text.Json;
 using GameServer.Patterns.Command;
 using GameServer.Patterns;
 using System.Threading;
+using GameServer.Patterns.InterpreterDemo;
 
 namespace GameServer.Hubs
 {
@@ -33,6 +34,7 @@ namespace GameServer.Hubs
 
         public async void SendMessage(string playerId, string text)
         {
+            new TextExpression(_gameController, _map, Clients, text, playerId).Interpret();
             await _gameController.Run(new AddMessageCommand(playerId, text, _map, Clients), playerId);
         }
 

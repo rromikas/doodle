@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using GameServer.Patterns.State;
 using GameServer.Patterns.Chain;
+using GameServer.Patterns.InterpreterDemo;
 
 namespace GameServer.Patterns.Command
 {
